@@ -35,7 +35,7 @@ export default function Chat() {
     <>
       {activeChat ? (
         <section
-          className={`absolute inset-0 z-10 flex w-full flex-1 flex-col bg-black md:static`}
+          className={`absolute inset-0 z-10 flex w-full flex-1 flex-col bg-white dark:bg-black md:static`}
         >
           {/* Header */}
           <ChatHeader />
