@@ -13,6 +13,9 @@ import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@heroui/skeleton";
 import { addToast } from "@heroui/toast";
+import { Tooltip } from "@heroui/tooltip";
+
+import Logo from "../logo";
 
 import { siteConfig } from "@/config/site";
 import { useStoreUserEffect } from "@/hooks/use-store-user";
@@ -43,9 +46,13 @@ export default function ChatListHeader() {
       </ClerkLoaded>
 
       {/* App Name */}
-      <h1 className={`justify-self-center text-xl font-bold`}>
-        {siteConfig.name}
-      </h1>
+      <Tooltip content={siteConfig.name} placement="bottom">
+        <div className="justify-self-center">
+          <Logo height={40} />
+
+          <h1 className={`sr-only`}>{siteConfig.name}</h1>
+        </div>
+      </Tooltip>
 
       {/* CTA */}
       {mounted && (
@@ -70,7 +77,8 @@ export default function ChatListHeader() {
                 onPress={() =>
                   addToast({
                     title: "Settings",
-                    description: "Configure settings. This feature is coming soon.",
+                    description:
+                      "Configure settings. This feature is coming soon.",
                     color: "warning",
                   })
                 }

@@ -46,9 +46,9 @@ export default function Chat() {
         </section>
       ) : (
         <section
-          className={`grid flex-1 place-content-center bg-neutral-100 dark:bg-neutral-950`}
+          className={`grid flex-1 place-content-center bg-neutral-100 text-default-500 dark:bg-neutral-950`}
         >
-          <h2 className="text-center text-xl">Select a chat</h2>
+          <h2 className="text-lg font-bold">Select a chat</h2>
         </section>
       )}
     </>
