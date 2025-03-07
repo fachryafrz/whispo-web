@@ -7,13 +7,25 @@ export default defineSchema({
     username: v.string(),
     email: v.string(),
     tokenIdentifier: v.string(),
-  }).index("by_token", ["tokenIdentifier"]),
+    avatarUrl: v.string(),
+  })
+    .index("by_token", ["tokenIdentifier"])
+    .searchIndex("search_username", {
+      searchField: "username",
+    }),
 
   chats: defineTable({
     type: v.string(),
     participants: v.array(v.string()),
     name: v.string(),
-  }),
+    imageUrl: v.string(),
+    lastMessage: v.string(),
+    lastMessageSender: v.string(),
+    lastMessageTime: v.number(),
+    pinned: v.boolean(),
+    unreadCount: v.number(),
+    seenBy: v.array(v.id("users")),
+  }).index("by_participants", ["participants"]),
 
   messages: defineTable({
     chat: v.id("chats"),

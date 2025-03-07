@@ -3,7 +3,11 @@ import { Image } from "@heroui/image";
 import { addToast } from "@heroui/toast";
 import { Search } from "lucide-react";
 
+import { useChat } from "@/zustand/chat";
+
 export default function ChatHeader() {
+  const { activeChat, setActiveChat, clearActiveChat } = useChat();
+
   return (
     <div className={`p-4`}>
       <div className="grid grid-cols-[40px_1fr_auto] items-center gap-2">
@@ -13,17 +17,17 @@ export default function ChatHeader() {
           draggable={false}
           height={40}
           radius="full"
-          src="https://i.pravatar.cc/150?u=a04258114e29026702d"
+          src={activeChat?.imageUrl}
           width={40}
         />
 
         {/* Content */}
         <div className="min-w-0">
           {/* Name */}
-          <h2 className="text-small font-bold">Shovi</h2>
+          <h2 className="text-small font-bold">{activeChat?.name}</h2>
           {/* Text */}
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500">
-            Private Chat
+            {activeChat?.type === "private" ? "Private" : "Group"}
           </p>
         </div>
 
@@ -36,7 +40,8 @@ export default function ChatHeader() {
             onPress={() =>
               addToast({
                 title: "Search messages",
-                description: "Search through your messages. This feature is coming soon.",
+                description:
+                  "Search through your messages. This feature is coming soon.",
                 color: "warning",
               })
             }
