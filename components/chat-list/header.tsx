@@ -1,6 +1,6 @@
 "use client";
 
-import { UserButton } from "@clerk/nextjs";
+import { ClerkLoaded, ClerkLoading, UserButton } from "@clerk/nextjs";
 import { Button } from "@heroui/button";
 import {
   Dropdown,
@@ -11,6 +11,7 @@ import {
 import { EllipsisVertical, Moon, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
+import { Skeleton } from "@heroui/skeleton";
 
 import { siteConfig } from "@/config/site";
 
@@ -26,34 +27,45 @@ export default function Header() {
     setMounted(true);
   }, []);
 
-  if (!mounted) return null; // Hindari rendering sebelum mounting
-
   return (
-    <header className={`flex items-center justify-between p-4`}>
+    <header className={`grid grid-cols-3 items-center p-4`}>
       {/* User */}
-      <UserButton />
+
+      <ClerkLoading>
+        <Skeleton className="flex h-10 w-10 justify-self-start rounded-full" />
+      </ClerkLoading>
+
+      <ClerkLoaded>
+        <UserButton />
+      </ClerkLoaded>
 
       {/* App Name */}
-      <h1 className={`text-xl font-bold`}>{siteConfig.name}</h1>
+      <h1 className={`justify-self-center text-xl font-bold`}>
+        {siteConfig.name}
+      </h1>
 
       {/* CTA */}
-      <Dropdown placement="bottom-end">
-        <DropdownTrigger>
-          <Button isIconOnly variant="light">
-            <EllipsisVertical />
-          </Button>
-        </DropdownTrigger>
-        <DropdownMenu aria-label="Menu">
-          <DropdownItem key="toggle-theme" onPress={onChange}>
-            <div className={`flex items-center gap-2`}>
-              {resolvedTheme === "light" ? <Moon /> : <Sun />}
-              <span>
-                {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
-              </span>
-            </div>
-          </DropdownItem>
-        </DropdownMenu>
-      </Dropdown>
+      {mounted && (
+        <div className={`justify-self-end`}>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button isIconOnly variant="light">
+                <EllipsisVertical />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Menu">
+              <DropdownItem key="toggle-theme" onPress={onChange}>
+                <div className={`flex items-center gap-2`}>
+                  {resolvedTheme === "light" ? <Moon /> : <Sun />}
+                  <span>
+                    {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
+                  </span>
+                </div>
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        </div>
+      )}
     </header>
   );
 }

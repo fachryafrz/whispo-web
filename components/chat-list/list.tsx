@@ -1,11 +1,15 @@
+import { Button } from "@heroui/button";
 import { Image } from "@heroui/image";
 
 export default function List() {
   return (
-    <ul className={`overflow-y-auto h-full`}>
+    <ul className={`h-full overflow-y-auto`}>
       {[...Array(50)].map((_, i) => (
         <li key={i}>
-          <div className="flex cursor-pointer items-center gap-3 p-4 hover:bg-neutral-200 dark:hover:bg-neutral-800">
+          <Button
+            className="flex h-auto w-full items-center justify-start gap-3 rounded-none border-b border-default-200 p-4 text-start dark:border-neutral-800"
+            variant="light"
+          >
             <Image
               alt="heroui logo"
               height={40}
@@ -17,7 +21,7 @@ export default function List() {
               <p className="text-md">HeroUI</p>
               <p className="text-small text-default-500">heroui.com</p>
             </div>
-          </div>
+          </Button>
         </li>
       ))}
     </ul>

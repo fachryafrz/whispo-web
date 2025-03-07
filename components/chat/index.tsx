@@ -11,17 +11,19 @@ export default function Chat() {
   };
 
   return (
-    <section className={`flex flex-1 flex-col bg-neutral-900`}>
+    <section
+      className={`flex flex-1 flex-col bg-neutral-100 dark:bg-neutral-900`}
+    >
       {/* Header */}
       <div className={`p-4`}>Header</div>
 
       {/* Chat */}
       <div
-        className={`flex flex-1 flex-col-reverse items-center overflow-y-auto bg-neutral-800`}
+        className={`flex flex-1 flex-col-reverse items-center overflow-y-auto bg-neutral-200 dark:bg-neutral-800`}
       >
         {/* Messages */}
         {messages.map((msg, i) => (
-          <div key={i} className={`p-4 flex-1 w-full`}>
+          <div key={i} className={`w-full p-4`}>
             {msg}
           </div>
         ))}
