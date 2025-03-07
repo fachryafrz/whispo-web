@@ -7,7 +7,7 @@ export default function ChatMessages({ messages }: { messages: string[] }) {
       <div className="relative flex h-full flex-1 flex-col-reverse items-center gap-1 overflow-y-auto p-4">
         {messages.map((msg: string, i: number) => (
           <div key={i} className="w-full">
-            <Card className="w-fit max-w-sm bg-white dark:bg-black">
+            <Card className="w-fit max-w-sm">
               <CardBody>
                 <p className="text-sm">{msg}</p>
               </CardBody>
