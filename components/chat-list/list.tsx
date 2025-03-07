@@ -64,6 +64,7 @@ function Item() {
               content: "bg-black text-white dark:bg-white dark:text-black",
             }}
             content="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cum adipisci ex blanditiis et numquam ipsa, asperiores a laudantium praesentium voluptatem reiciendis architecto esse delectus, error recusandae in! Distinctio cumque similique facere harum voluptatum numquam accusantium, provident possimus ipsam magnam quam quod porro beatae optio, voluptatibus ipsum! Quas minima nam aut."
+            delay={1000}
             placement="bottom-start"
           >
             <p className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500">

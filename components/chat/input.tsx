@@ -7,7 +7,7 @@ import { Paperclip, SendHorizontal } from "lucide-react";
 
 export default function ChatInput({ onPress }: { onPress: () => void }) {
   return (
-    <div className={`px-2 py-4`}>
+    <div className={`p-2`}>
       <form
         className="flex gap-2"
         onSubmit={(e) => {
@@ -21,14 +21,15 @@ export default function ChatInput({ onPress }: { onPress: () => void }) {
           onPress={() =>
             addToast({
               title: "Add attachments",
-              description: "Upload images and files. This feature is coming soon.",
+              description:
+                "Upload images and files. This feature is coming soon.",
               color: "warning",
             })
           }
         >
           <Paperclip size={20} />
         </Button>
-        <Input autoFocus placeholder="Type a message" />
+        <Input autoFocus placeholder="Type a message" radius="full" />
         <Button isIconOnly radius="full" type="submit" onPress={onPress}>
           <SendHorizontal size={20} />
         </Button>
