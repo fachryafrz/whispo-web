@@ -8,6 +8,7 @@ export type Chat = {
   type: string;
   participants: string[];
   name: string;
+  description: string;
   imageUrl: string;
   lastMessage?: string;
   lastMessageSender?: string;

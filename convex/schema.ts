@@ -18,6 +18,7 @@ export default defineSchema({
     type: v.string(),
     participants: v.array(v.string()),
     name: v.string(),
+    description: v.string(),
     imageUrl: v.string(),
     lastMessage: v.string(),
     lastMessageSender: v.string(),

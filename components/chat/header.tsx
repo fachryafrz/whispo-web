@@ -37,7 +37,7 @@ export default function ChatHeader() {
           <h2 className="text-small font-bold">{activeChat?.name}</h2>
           {/* Text */}
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500">
-            {activeChat?.type === "private" ? "Private" : "Group"}
+            {activeChat?.description}
           </p>
         </div>
 

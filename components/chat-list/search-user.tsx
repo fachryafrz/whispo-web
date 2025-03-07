@@ -76,6 +76,7 @@ export default function SearchUser() {
                       currentUser?.username as string,
                     ],
                     name: user.name,
+                    description: user.username,
                     imageUrl: user.avatarUrl,
                   });
                 }}
