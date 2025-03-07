@@ -8,15 +8,19 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/dropdown";
-import { EllipsisVertical, Moon, Sun } from "lucide-react";
+import { EllipsisVertical, Moon, Settings, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Skeleton } from "@heroui/skeleton";
+import { addToast } from "@heroui/toast";
 
 import { siteConfig } from "@/config/site";
+import { useStoreUserEffect } from "@/hooks/use-store-user";
 
 export default function Header() {
+  useStoreUserEffect();
   const { resolvedTheme, setTheme } = useTheme();
+
   const [mounted, setMounted] = useState(false);
 
   const onChange = () => {
@@ -30,7 +34,6 @@ export default function Header() {
   return (
     <header className={`grid grid-cols-3 items-center p-4`}>
       {/* User */}
-
       <ClerkLoading>
         <Skeleton className="flex h-10 w-10 justify-self-start rounded-full" />
       </ClerkLoading>
@@ -60,6 +63,21 @@ export default function Header() {
                   <span>
                     {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
                   </span>
+                </div>
+              </DropdownItem>
+              <DropdownItem
+                key="settings"
+                onPress={() =>
+                  addToast({
+                    title: "Settings",
+                    description: "This feature is coming soon.",
+                    color: "warning",
+                  })
+                }
+              >
+                <div className={`flex items-center gap-2`}>
+                  <Settings />
+                  <span>Settings</span>
                 </div>
               </DropdownItem>
             </DropdownMenu>
