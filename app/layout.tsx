@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   },
   description: siteConfig.description,
   icons: {
-    icon: "/favicon.ico", // path to favicon, so that it shouldn't be in app directory
+    icon: "/logo/logo.svg", // path to favicon, so that it shouldn't be in app directory
   },
 };
 
