@@ -60,6 +60,8 @@ export default function List() {
                     type: "private",
                     participants: ["a04258114e29026702d"],
                     name: "Someone",
+                    description:
+                      "Lorem ipsum dolor sit amet consectetur, adipisicing elit.",
                     imageUrl: "https://i.pravatar.cc/150?u=a04258114e29026702d",
                   })
                 }
