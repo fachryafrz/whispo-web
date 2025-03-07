@@ -14,8 +14,39 @@ export const metadata: Metadata = {
     template: `%s - ${siteConfig.name}`,
   },
   description: siteConfig.description,
-  icons: {
-    icon: "/logo/logo.svg", // path to favicon, so that it shouldn't be in app directory
+  openGraph: {
+    siteName: siteConfig.name,
+    title: siteConfig.name,
+    description: siteConfig.description,
+    url: siteConfig.url,
+    images: {
+      url: "/maskable/maskable_icon_x512.png",
+      width: 512,
+      height: 512,
+    },
+  },
+  // icons: {
+  //   icon: [
+  //     { url: "/favicon/dark/favicon.ico" },
+  //     {
+  //       media: "(prefers-color-scheme: light)",
+  //       url: "/favicon/light/favicon.ico",
+  //     },
+  //     {
+  //       media: "(prefers-color-scheme: dark)",
+  //       url: "/favicon/dark/favicon.ico",
+  //     },
+  //   ],
+  // },
+  robots: {
+    index: false,
+    follow: false,
+    noimageindex: true,
+    googleBot: {
+      index: false,
+      follow: false,
+      noimageindex: true,
+    },
   },
 };
 
