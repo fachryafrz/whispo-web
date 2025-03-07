@@ -1,0 +1,25 @@
+import { Image } from "@heroui/image";
+
+export default function List() {
+  return (
+    <ul className={`overflow-y-auto h-full`}>
+      {[...Array(50)].map((_, i) => (
+        <li key={i}>
+          <div className="flex cursor-pointer items-center gap-3 p-4 hover:bg-neutral-200 dark:hover:bg-neutral-800">
+            <Image
+              alt="heroui logo"
+              height={40}
+              radius="sm"
+              src="https://avatars.githubusercontent.com/u/86160567?s=200&v=4"
+              width={40}
+            />
+            <div className="flex flex-col">
+              <p className="text-md">HeroUI</p>
+              <p className="text-small text-default-500">heroui.com</p>
+            </div>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
