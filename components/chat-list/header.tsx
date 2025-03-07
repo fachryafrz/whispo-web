@@ -17,7 +17,7 @@ import { addToast } from "@heroui/toast";
 import { siteConfig } from "@/config/site";
 import { useStoreUserEffect } from "@/hooks/use-store-user";
 
-export default function Header() {
+export default function ChatListHeader() {
   useStoreUserEffect();
   const { resolvedTheme, setTheme } = useTheme();
 
@@ -52,7 +52,7 @@ export default function Header() {
         <div className={`justify-self-end`}>
           <Dropdown placement="bottom-end">
             <DropdownTrigger>
-              <Button isIconOnly variant="light">
+              <Button isIconOnly radius="full" variant="light">
                 <EllipsisVertical />
               </Button>
             </DropdownTrigger>
@@ -70,7 +70,7 @@ export default function Header() {
                 onPress={() =>
                   addToast({
                     title: "Settings",
-                    description: "This feature is coming soon.",
+                    description: "Configure settings. This feature is coming soon.",
                     color: "warning",
                   })
                 }
