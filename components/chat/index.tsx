@@ -34,7 +34,9 @@ export default function Chat() {
   return (
     <>
       {activeChat ? (
-        <section className={`flex flex-1 flex-col`}>
+        <section
+          className={`absolute inset-0 z-10 flex w-full flex-1 flex-col bg-black md:static`}
+        >
           {/* Header */}
           <ChatHeader />
 
@@ -46,7 +48,7 @@ export default function Chat() {
         </section>
       ) : (
         <section
-          className={`grid flex-1 place-content-center bg-neutral-100 text-default-500 dark:bg-neutral-950`}
+          className={`hidden flex-1 place-content-center bg-neutral-100 text-default-500 dark:bg-neutral-950 md:grid`}
         >
           <h2 className="text-lg font-bold">Select a chat</h2>
         </section>

@@ -3,7 +3,7 @@ import ChatList from "@/components/chat-list";
 
 export default function Home() {
   return (
-    <div className={`flex h-screen`}>
+    <div className={`relative flex h-screen`}>
       <ChatList />
 
       <Chat />

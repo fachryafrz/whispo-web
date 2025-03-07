@@ -1,7 +1,7 @@
 import { Button } from "@heroui/button";
 import { Image } from "@heroui/image";
 import { addToast } from "@heroui/toast";
-import { Search } from "lucide-react";
+import { ArrowLeft, Search } from "lucide-react";
 
 import { useChat } from "@/zustand/chat";
 
@@ -10,7 +10,17 @@ export default function ChatHeader() {
 
   return (
     <div className={`p-4`}>
-      <div className="grid grid-cols-[40px_1fr_auto] items-center gap-2">
+      <div className="flex items-center gap-2">
+        <Button
+          isIconOnly
+          className="md:hidden"
+          radius="full"
+          variant="light"
+          onPress={() => clearActiveChat()}
+        >
+          <ArrowLeft />
+        </Button>
+
         {/* Avatar/Image */}
         <Image
           alt="avatar"
@@ -22,7 +32,7 @@ export default function ChatHeader() {
         />
 
         {/* Content */}
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           {/* Name */}
           <h2 className="text-small font-bold">{activeChat?.name}</h2>
           {/* Text */}

@@ -48,7 +48,7 @@ export default function ChatListHeader() {
       {/* App Name */}
       <Tooltip content={siteConfig.name} placement="bottom">
         <div className="justify-self-center">
-          <Logo height={40} />
+          <Logo height={30} />
 
           <h1 className={`sr-only`}>{siteConfig.name}</h1>
         </div>
