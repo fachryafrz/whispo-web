@@ -9,7 +9,7 @@ import ChatCard from "./card";
 import { useSearchUser } from "@/zustand/search-user";
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Chat } from "@/types";
 
 export default function List() {
@@ -68,14 +68,25 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
   const { setActiveChat } = useChat();
   const currentUser = useQuery(api.users.getCurrentUser);
 
-  const interlocutor = chat.participants.find(
-    (p) => p.username !== currentUser?.username,
+  const interlocutorSelector = chat.participants.find(
+    (p) => p !== currentUser?._id,
   );
+  const interlocutor = useQuery(api.users.getUserById, {
+    id: interlocutorSelector as Id<"users">,
+  });
   const storeChat = useMutation(api.chats.store);
 
   const handleSelectChat = () => {
-    storeChat(chat as Chat);
-    setActiveChat(chat as Chat);
+    const value: Chat = {
+      type: chat.type as "private" | "group",
+      participants: [
+        interlocutor?._id as Id<"users">,
+        currentUser?._id as Id<"users">,
+      ],
+    };
+
+    storeChat(value);
+    setActiveChat(value);
   };
 
   return (
@@ -83,7 +94,7 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
       description={chat.lastMessage}
       imageUrl={
         chat.type === "private"
-          ? (interlocutor?.imageUrl ?? "")
+          ? (interlocutor?.avatarUrl ?? "")
           : (chat.imageUrl ?? "")
       }
       timeSent={

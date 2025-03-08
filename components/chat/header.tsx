@@ -6,14 +6,18 @@ import { useQuery } from "convex/react";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
 
 export default function ChatHeader() {
   const { activeChat, setActiveChat, clearActiveChat } = useChat();
   const currentUser = useQuery(api.users.getCurrentUser);
 
-  const interlocutor = activeChat?.participants.find(
-    (p) => p.username !== currentUser?.username,
+  const interlocutorSelector = activeChat?.participants.find(
+    (p) => p !== currentUser?._id,
   );
+  const interlocutor = useQuery(api.users.getUserById, {
+    id: interlocutorSelector as Id<"users">,
+  });
 
   return (
     <div className={`p-4`}>
@@ -36,7 +40,7 @@ export default function ChatHeader() {
           radius="full"
           src={
             activeChat?.type === "private"
-              ? interlocutor?.imageUrl
+              ? interlocutor?.avatarUrl
               : activeChat?.imageUrl
           }
           width={40}

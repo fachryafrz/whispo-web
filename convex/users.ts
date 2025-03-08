@@ -33,6 +33,16 @@ export const getCurrentUser = query({
   },
 });
 
+export const getUserById = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_id", (q) => q.eq("_id", args.id))
+      .first();
+  },
+});
+
 export const searchByUsername = query({
   args: { usernameQuery: v.string() },
   handler: async (ctx, args) => {

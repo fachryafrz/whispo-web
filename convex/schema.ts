@@ -16,14 +16,7 @@ export default defineSchema({
 
   chats: defineTable({
     type: v.string(), // "private" or "group"
-    participants: v.array(
-      v.object({
-        id: v.id("users"),
-        name: v.string(),
-        username: v.string(),
-        imageUrl: v.string(),
-      }),
-    ),
+    participants: v.array(v.id("users")),
     name: v.optional(v.string()), // For group chats
     description: v.optional(v.string()), // For group chats
     imageUrl: v.optional(v.string()), // For group chats

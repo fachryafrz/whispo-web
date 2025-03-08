@@ -32,13 +32,17 @@ export default function ChatCard({
     >
       <div className="grid w-full grid-cols-[40px_1fr_auto] items-center gap-2">
         {/* Avatar/Image */}
-        <Image
-          alt="avatar"
-          height={40}
-          radius="full"
-          src={imageUrl}
-          width={40}
-        />
+        <div>
+          {imageUrl && (
+            <Image
+              alt="avatar"
+              height={40}
+              radius="full"
+              src={imageUrl}
+              width={40}
+            />
+          )}
+        </div>
 
         {/* Content */}
         <div className="min-w-0">
@@ -58,7 +62,7 @@ export default function ChatCard({
 
         {/* Info */}
         {info && (
-          <div className="flex flex-col h-full items-end gap-1">
+          <div className="flex h-full flex-col items-end gap-1">
             {/* Time sent */}
             <span className="text-xs">{timeSent}</span>
 

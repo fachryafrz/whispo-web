@@ -8,6 +8,8 @@ import ChatInput from "./input";
 
 import { useChat } from "@/zustand/chat";
 
+// TODO: Clear active chat when deleting chat
+
 export default function Chat() {
   const { activeChat, clearActiveChat } = useChat();
 

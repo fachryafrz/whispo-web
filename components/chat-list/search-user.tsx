@@ -27,20 +27,7 @@ export default function SearchUser() {
   const handleSelectUser = (user: Doc<"users">) => {
     const value: Chat = {
       type: "private",
-      participants: [
-        {
-          id: user._id,
-          name: user.name,
-          username: user.username,
-          imageUrl: user.avatarUrl,
-        },
-        {
-          id: currentUser?._id as Id<"users">,
-          name: currentUser?.name as string,
-          username: currentUser?.username as string,
-          imageUrl: currentUser?.avatarUrl as string,
-        },
-      ],
+      participants: [user._id, currentUser?._id as Id<"users">],
     };
 
     storeChat(value);
