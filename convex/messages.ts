@@ -1,6 +1,6 @@
-import { v } from "convex/values";
-
 import { mutation, query } from "./_generated/server";
+
+import { Message } from "@/types";
 
 export const get = query({
   args: {},
@@ -10,14 +10,7 @@ export const get = query({
 });
 
 export const store = mutation({
-  args: {
-    chat: v.id("chats"),
-    sender: v.id("users"),
-    content: v.string(),
-    mediaUrl: v.string(),
-    readBy: v.array(v.id("users")),
-  },
-  handler: async (ctx, args) => {
+  handler: async (ctx, args: Message) => {
     return await ctx.db.insert("messages", {
       chat: args.chat,
       sender: args.sender,

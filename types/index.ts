@@ -19,3 +19,17 @@ export type Chat = {
   unreadCount?: number;
   seenBy?: Id<"users">[];
 };
+
+export type Message = {
+  chat: Id<"chats">;
+  sender: Id<"users">;
+  content: string;
+  mediaUrl?: string;
+  readBy?: Id<"users">[];
+};
+
+export type Friendship = {
+  user1: Id<"users">;
+  user2: Id<"users">;
+  status: "pending" | "accepted" | "rejected";
+};

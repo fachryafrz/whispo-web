@@ -32,13 +32,13 @@ export default defineSchema({
     chat: v.id("chats"),
     sender: v.id("users"),
     content: v.string(),
-    mediaUrl: v.string(),
-    readBy: v.array(v.id("users")),
-  }),
+    mediaUrl: v.optional(v.string()),
+    readBy: v.optional(v.array(v.id("users"))),
+  }).index("by_chat", ["chat"]),
 
   friendships: defineTable({
     user1: v.id("users"),
     user2: v.id("users"),
     status: v.string(),
-  }),
+  }).index("by_users", ["user1", "user2"]),
 });
