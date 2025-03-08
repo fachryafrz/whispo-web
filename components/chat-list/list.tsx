@@ -3,6 +3,7 @@ import { Plus } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { Tooltip } from "@heroui/tooltip";
 import { useClerk } from "@clerk/nextjs";
+import dayjs from "dayjs";
 
 import ChatCard from "./card";
 
@@ -11,6 +12,7 @@ import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { Chat } from "@/types";
+
 
 export default function List() {
   const { open, setOpen } = useSearchUser();
@@ -85,6 +87,11 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
         chat.type === "private"
           ? (interlocutor?.imageUrl ?? "")
           : (chat.imageUrl ?? "")
+      }
+      timeSent={
+        chat.lastMessageTime
+          ? new Date(chat.lastMessageTime).toString()
+          : dayjs(chat._creationTime).format("HH:mm")
       }
       title={
         chat.type === "private" ? (interlocutor?.name ?? "") : (chat.name ?? "")

@@ -58,7 +58,7 @@ export default function ChatCard({
 
         {/* Info */}
         {info && (
-          <div className="flex flex-col items-end gap-1">
+          <div className="flex flex-col h-full items-end gap-1">
             {/* Time sent */}
             <span className="text-xs">{timeSent}</span>
 
