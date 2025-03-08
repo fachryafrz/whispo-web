@@ -1,5 +1,3 @@
-/* eslint-disable jsx-a11y/no-autofocus */
-
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { addToast } from "@heroui/toast";
@@ -28,7 +26,7 @@ export default function ChatInput({
         >
           <Paperclip size={20} />
         </Button>
-        <Input autoFocus placeholder="Type a message" radius="full" />
+        <Input placeholder="Type a message" radius="full" />
         <Button isIconOnly radius="full" type="submit">
           <SendHorizontal size={20} />
         </Button>
