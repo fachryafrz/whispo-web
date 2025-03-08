@@ -2,14 +2,13 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { ArrowLeft } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
-import { useClerk } from "@clerk/nextjs";
 
 import ChatCard from "./card";
 
 import { useSearchUser } from "@/zustand/search-user";
 import { api } from "@/convex/_generated/api";
 import { useChat } from "@/zustand/chat";
-import { Doc } from "@/convex/_generated/dataModel";
+import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Chat } from "@/types";
 
 export default function SearchUser() {
@@ -17,10 +16,8 @@ export default function SearchUser() {
   const { open, setOpen, query, setQuery } = useSearchUser();
   const { setActiveChat } = useChat();
 
-  // Clerk
-  const { user: currentUser } = useClerk();
-
   // Convex
+  const currentUser = useQuery(api.users.getCurrentUser);
   const users = useQuery(api.users.searchByUsername, {
     usernameQuery: query,
   });
@@ -32,14 +29,16 @@ export default function SearchUser() {
       type: "private",
       participants: [
         {
+          id: user._id,
           name: user.name,
           username: user.username,
           imageUrl: user.avatarUrl,
         },
         {
-          name: currentUser?.fullName as string,
+          id: currentUser?._id as Id<"users">,
+          name: currentUser?.name as string,
           username: currentUser?.username as string,
-          imageUrl: currentUser?.imageUrl as string,
+          imageUrl: currentUser?.avatarUrl as string,
         },
       ],
     };

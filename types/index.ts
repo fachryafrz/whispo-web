@@ -9,6 +9,7 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 export type Chat = {
   type: "private" | "group";
   participants: {
+    id: Id<"users">;
     name: string;
     username: string;
     imageUrl: string;

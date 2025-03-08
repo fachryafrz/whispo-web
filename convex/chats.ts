@@ -1,5 +1,6 @@
 import { mutation, query } from "./_generated/server";
 
+import { arraysEqual } from "@/helper/arrays-equal";
 import { Chat } from "@/types";
 
 export const get = query({
@@ -12,20 +13,16 @@ export const get = query({
 export const getChatsByCurrentUser = query({
   args: {},
   handler: async (ctx) => {
-    // Mendapatkan identitas pengguna yang sedang login
     const identity = await ctx.auth.getUserIdentity();
 
-    if (identity === null) {
+    if (!identity) {
       throw new Error("Not authenticated");
     }
-
-    // Menggunakan ID pengguna dari identity
-    const username = identity.nickname;
 
     const allChats = await ctx.db.query("chats").collect();
     const userChats = allChats.filter((chat) =>
       chat.participants.some(
-        (participant) => participant.username === username,
+        (participant) => participant.username === identity.nickname,
       ),
     );
 
@@ -35,16 +32,23 @@ export const getChatsByCurrentUser = query({
 
 export const store = mutation({
   handler: async (ctx, args: Chat) => {
-    const existingChat = await ctx.db
+    const existingChats = await ctx.db
       .query("chats")
-      .withIndex("by_participants_and_type", (q) =>
-        q.eq("participants", args.participants).eq("type", args.type),
-      )
-      .first();
+      .withIndex("by_type", (q) => q.eq("type", args.type))
+      .collect(); // Ambil semua chat dengan tipe yang sama
+
+    // Filter manual untuk cek apakah `participants` sama persis
+    const existingChat = existingChats.find((chat) =>
+      arraysEqual(
+        chat.participants.map((p) => p.id),
+        args.participants.map((p) => p.id),
+      ),
+    );
 
     if (existingChat) {
-      // return existingChat;
-      return await ctx.db.patch(existingChat._id, args);
+      await ctx.db.patch(existingChat._id, args);
+
+      return await ctx.db.get(existingChat._id);
     }
 
     return await ctx.db.insert("chats", args);

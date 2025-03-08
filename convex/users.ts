@@ -9,6 +9,30 @@ export const get = query({
   },
 });
 
+export const getCurrentUser = query({
+  args: {},
+  handler: async (ctx) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      throw new Error("Not authenticated");
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    return user;
+  },
+});
+
 export const searchByUsername = query({
   args: { usernameQuery: v.string() },
   handler: async (ctx, args) => {
@@ -36,7 +60,7 @@ export const store = mutation({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Called storeUser without authentication present");
+      throw new Error("Not authenticated");
     }
 
     // Check if we've already stored this identity before.

@@ -2,13 +2,14 @@ import { Button } from "@heroui/button";
 import { Image } from "@heroui/image";
 import { addToast } from "@heroui/toast";
 import { ArrowLeft, Search } from "lucide-react";
-import { useClerk } from "@clerk/nextjs";
+import { useQuery } from "convex/react";
 
 import { useChat } from "@/zustand/chat";
+import { api } from "@/convex/_generated/api";
 
 export default function ChatHeader() {
   const { activeChat, setActiveChat, clearActiveChat } = useChat();
-  const { user: currentUser } = useClerk();
+  const currentUser = useQuery(api.users.getCurrentUser);
 
   const interlocutor = activeChat?.participants.find(
     (p) => p.username !== currentUser?.username,

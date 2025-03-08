@@ -2,7 +2,6 @@ import { Button } from "@heroui/button";
 import { Plus } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import { Tooltip } from "@heroui/tooltip";
-import { useClerk } from "@clerk/nextjs";
 import dayjs from "dayjs";
 
 import ChatCard from "./card";
@@ -12,7 +11,6 @@ import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 import { Chat } from "@/types";
-
 
 export default function List() {
   const { open, setOpen } = useSearchUser();
@@ -68,7 +66,7 @@ export default function List() {
 
 function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
   const { setActiveChat } = useChat();
-  const { user: currentUser } = useClerk();
+  const currentUser = useQuery(api.users.getCurrentUser);
 
   const interlocutor = chat.participants.find(
     (p) => p.username !== currentUser?.username,

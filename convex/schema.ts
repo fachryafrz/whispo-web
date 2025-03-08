@@ -18,6 +18,7 @@ export default defineSchema({
     type: v.string(), // "private" or "group"
     participants: v.array(
       v.object({
+        id: v.id("users"),
         name: v.string(),
         username: v.string(),
         imageUrl: v.string(),
@@ -32,7 +33,9 @@ export default defineSchema({
     pinned: v.optional(v.boolean()),
     unreadCount: v.optional(v.number()),
     seenBy: v.optional(v.array(v.id("users"))),
-  }).index("by_participants_and_type", ["participants", "type"]),
+  })
+    .index("by_type", ["type"])
+    .index("by_participants_and_type", ["participants", "type"]),
 
   messages: defineTable({
     chat: v.id("chats"),
