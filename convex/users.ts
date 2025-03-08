@@ -76,9 +76,9 @@ export const store = mutation({
       .unique();
 
     if (user !== null) {
-      // If we've seen this identity before but the name has changed, patch the value.
-      if (user.name !== identity.name) {
-        await ctx.db.patch(user._id, { name: identity.name });
+      // If we've seen this identity before but the username has changed, patch the value.
+      if (user.username !== identity.nickname) {
+        await ctx.db.patch(user._id, { username: identity.nickname });
       }
 
       return user._id;

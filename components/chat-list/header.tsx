@@ -18,10 +18,8 @@ import { Tooltip } from "@heroui/tooltip";
 import Logo from "../logo";
 
 import { siteConfig } from "@/config/site";
-import { useStoreUserEffect } from "@/hooks/use-store-user";
 
 export default function ChatListHeader() {
-  useStoreUserEffect();
   const { resolvedTheme, setTheme } = useTheme();
 
   const [mounted, setMounted] = useState(false);
