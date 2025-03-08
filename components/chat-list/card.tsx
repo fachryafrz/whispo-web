@@ -16,12 +16,12 @@ type ChatCardProps = {
 
 export default function ChatCard({
   title,
-  description,
+  description = "...",
   imageUrl,
   info = true,
-  timeSent = "12:00",
-  unreadCount = 53,
-  pinned = true,
+  timeSent, // TODO: Example: 12:00
+  unreadCount, // TODO: Example: 53
+  pinned, // TODO: Example: true
   onPress,
 }: ChatCardProps) {
   return (

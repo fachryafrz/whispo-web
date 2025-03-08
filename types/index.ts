@@ -7,11 +7,15 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 };
 
 export type Chat = {
-  type: string;
-  participants: string[];
-  name: string;
-  description: string;
-  imageUrl: string;
+  type: "private" | "group";
+  participants: {
+    name: string;
+    username: string;
+    imageUrl: string;
+  }[];
+  name?: string; // For group chats
+  description?: string; // For group chats
+  imageUrl?: string; // For group chats
   lastMessage?: string;
   lastMessageSender?: string;
   lastMessageTime?: number;

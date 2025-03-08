@@ -15,18 +15,24 @@ export default defineSchema({
     }),
 
   chats: defineTable({
-    type: v.string(),
-    participants: v.array(v.string()),
-    name: v.string(),
-    description: v.string(),
-    imageUrl: v.string(),
+    type: v.string(), // "private" or "group"
+    participants: v.array(
+      v.object({
+        name: v.string(),
+        username: v.string(),
+        imageUrl: v.string(),
+      }),
+    ),
+    name: v.optional(v.string()), // For group chats
+    description: v.optional(v.string()), // For group chats
+    imageUrl: v.optional(v.string()), // For group chats
     lastMessage: v.optional(v.string()),
     lastMessageSender: v.optional(v.string()),
     lastMessageTime: v.optional(v.number()),
     pinned: v.optional(v.boolean()),
     unreadCount: v.optional(v.number()),
     seenBy: v.optional(v.array(v.id("users"))),
-  }).index("by_participants", ["participants"]),
+  }).index("by_participants_and_type", ["participants", "type"]),
 
   messages: defineTable({
     chat: v.id("chats"),

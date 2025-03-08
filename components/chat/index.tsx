@@ -13,7 +13,9 @@ export default function Chat() {
 
   const [messages, setMessages] = useState<string[]>([]);
 
-  const addMessage = () => {
+  const sendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+
     setMessages((prev) => [`Message ${prev.length}`, ...prev]); // Tambah ke awal array
   };
 
@@ -44,7 +46,7 @@ export default function Chat() {
           <ChatMessages messages={messages} />
 
           {/* Input */}
-          <ChatInput onPress={addMessage} />
+          <ChatInput onSubmit={sendMessage} />
         </section>
       ) : (
         <section

@@ -1,17 +1,19 @@
 import { Button } from "@heroui/button";
 import { Plus } from "lucide-react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { Tooltip } from "@heroui/tooltip";
+import { useClerk } from "@clerk/nextjs";
 
 import ChatCard from "./card";
 
 import { useSearchUser } from "@/zustand/search-user";
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
+import { Doc } from "@/convex/_generated/dataModel";
+import { Chat } from "@/types";
 
 export default function List() {
   const { open, setOpen } = useSearchUser();
-  const { setActiveChat } = useChat();
 
   const chats = useQuery(api.chats.getChatsByCurrentUser);
 
@@ -42,34 +44,52 @@ export default function List() {
       )}
 
       {/* List of chats */}
+      {/* TODO: Hide if there is no last message */}
       {chats?.length! > 0 && (
         <ul className={`h-full overflow-y-auto`}>
-          {chats?.map((chat) => (
-            <li key={chat._id}>
-              <ChatCard
-                description="Lorem ipsum dolor sit amet consectetur, adipisicing elit. Cum
-            adipisci ex blanditiis et numquam ipsa, asperiores a laudantium
-            praesentium voluptatem reiciendis architecto esse delectus, error
-            recusandae in! Distinctio cumque similique facere harum voluptatum
-            numquam accusantium, provident possimus ipsam magnam quam quod porro
-            beatae optio, voluptatibus ipsum! Quas minima nam aut."
-                imageUrl={"https://i.pravatar.cc/150?u=a04258114e29026702d"}
-                title={"Someone"}
-                onPress={() =>
-                  setActiveChat({
-                    type: "private",
-                    participants: ["a04258114e29026702d"],
-                    name: "Someone",
-                    description:
-                      "Lorem ipsum dolor sit amet consectetur, adipisicing elit.",
-                    imageUrl: "https://i.pravatar.cc/150?u=a04258114e29026702d",
-                  })
-                }
-              />
-            </li>
-          ))}
+          {chats
+            ?.sort((a, b) =>
+              b.lastMessageTime && a.lastMessageTime
+                ? b.lastMessageTime - a.lastMessageTime
+                : b._creationTime - a._creationTime,
+            )
+            .map((chat) => (
+              <li key={chat._id}>
+                <ChatListCard chat={chat} />
+              </li>
+            ))}
         </ul>
       )}
     </div>
+  );
+}
+
+function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
+  const { setActiveChat } = useChat();
+  const { user: currentUser } = useClerk();
+
+  const interlocutor = chat.participants.find(
+    (p) => p.username !== currentUser?.username,
+  );
+  const storeChat = useMutation(api.chats.store);
+
+  const handleSelectChat = () => {
+    storeChat(chat as Chat);
+    setActiveChat(chat as Chat);
+  };
+
+  return (
+    <ChatCard
+      description={chat.lastMessage}
+      imageUrl={
+        chat.type === "private"
+          ? (interlocutor?.imageUrl ?? "")
+          : (chat.imageUrl ?? "")
+      }
+      title={
+        chat.type === "private" ? (interlocutor?.name ?? "") : (chat.name ?? "")
+      }
+      onPress={() => handleSelectChat()}
+    />
   );
 }

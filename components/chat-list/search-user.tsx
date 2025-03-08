@@ -1,7 +1,7 @@
 import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { ArrowLeft } from "lucide-react";
-import { useQuery } from "convex/react";
+import { useMutation, useQuery } from "convex/react";
 import { useClerk } from "@clerk/nextjs";
 
 import ChatCard from "./card";
@@ -9,16 +9,44 @@ import ChatCard from "./card";
 import { useSearchUser } from "@/zustand/search-user";
 import { api } from "@/convex/_generated/api";
 import { useChat } from "@/zustand/chat";
+import { Doc } from "@/convex/_generated/dataModel";
+import { Chat } from "@/types";
 
 export default function SearchUser() {
+  // Zustand
   const { open, setOpen, query, setQuery } = useSearchUser();
   const { setActiveChat } = useChat();
 
+  // Clerk
   const { user: currentUser } = useClerk();
 
+  // Convex
   const users = useQuery(api.users.searchByUsername, {
     usernameQuery: query,
   });
+  const storeChat = useMutation(api.chats.store);
+
+  // Functions
+  const handleSelectUser = (user: Doc<"users">) => {
+    const value: Chat = {
+      type: "private",
+      participants: [
+        {
+          name: user.name,
+          username: user.username,
+          imageUrl: user.avatarUrl,
+        },
+        {
+          name: currentUser?.fullName as string,
+          username: currentUser?.username as string,
+          imageUrl: currentUser?.imageUrl as string,
+        },
+      ],
+    };
+
+    storeChat(value);
+    setActiveChat(value);
+  };
 
   return (
     <div
@@ -68,18 +96,7 @@ export default function SearchUser() {
                 imageUrl={user.avatarUrl}
                 info={false}
                 title={user.name}
-                onPress={() => {
-                  setActiveChat({
-                    type: "private",
-                    participants: [
-                      user.username,
-                      currentUser?.username as string,
-                    ],
-                    name: user.name,
-                    description: user.username,
-                    imageUrl: user.avatarUrl,
-                  });
-                }}
+                onPress={() => handleSelectUser(user)}
               />
             </li>
           ))}

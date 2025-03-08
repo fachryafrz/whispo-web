@@ -20,11 +20,13 @@ export const getChatsByCurrentUser = query({
     }
 
     // Menggunakan ID pengguna dari identity
-    const userId = identity.tokenIdentifier;
+    const username = identity.nickname;
 
     const allChats = await ctx.db.query("chats").collect();
     const userChats = allChats.filter((chat) =>
-      chat.participants.includes(userId),
+      chat.participants.some(
+        (participant) => participant.username === username,
+      ),
     );
 
     return userChats;
@@ -33,18 +35,18 @@ export const getChatsByCurrentUser = query({
 
 export const store = mutation({
   handler: async (ctx, args: Chat) => {
-    return await ctx.db.insert("chats", {
-      type: args.type,
-      participants: args.participants,
-      name: args.name,
-      description: args.description,
-      imageUrl: args.imageUrl,
-      lastMessage: args.lastMessage,
-      lastMessageSender: args.lastMessageSender,
-      lastMessageTime: args.lastMessageTime,
-      pinned: args.pinned,
-      unreadCount: args.unreadCount,
-      seenBy: args.seenBy,
-    });
+    const existingChat = await ctx.db
+      .query("chats")
+      .withIndex("by_participants_and_type", (q) =>
+        q.eq("participants", args.participants).eq("type", args.type),
+      )
+      .first();
+
+    if (existingChat) {
+      // return existingChat;
+      return await ctx.db.patch(existingChat._id, args);
+    }
+
+    return await ctx.db.insert("chats", args);
   },
 });
