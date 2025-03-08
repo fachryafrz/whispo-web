@@ -1,5 +1,7 @@
 import { SVGProps } from "react";
 
+import { Id } from "@/convex/_generated/dataModel";
+
 export type IconSvgProps = SVGProps<SVGSVGElement> & {
   size?: number;
 };
@@ -15,5 +17,5 @@ export type Chat = {
   lastMessageTime?: number;
   pinned?: boolean;
   unreadCount?: number;
-  seenBy?: string[];
+  seenBy?: Id<"users">[];
 };

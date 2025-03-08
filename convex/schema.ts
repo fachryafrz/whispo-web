@@ -20,12 +20,12 @@ export default defineSchema({
     name: v.string(),
     description: v.string(),
     imageUrl: v.string(),
-    lastMessage: v.string(),
-    lastMessageSender: v.string(),
-    lastMessageTime: v.number(),
-    pinned: v.boolean(),
-    unreadCount: v.number(),
-    seenBy: v.array(v.id("users")),
+    lastMessage: v.optional(v.string()),
+    lastMessageSender: v.optional(v.string()),
+    lastMessageTime: v.optional(v.number()),
+    pinned: v.optional(v.boolean()),
+    unreadCount: v.optional(v.number()),
+    seenBy: v.optional(v.array(v.id("users"))),
   }).index("by_participants", ["participants"]),
 
   messages: defineTable({
