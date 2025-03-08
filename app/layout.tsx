@@ -25,19 +25,18 @@ export const metadata: Metadata = {
       height: 512,
     },
   },
-  // icons: {
-  //   icon: [
-  //     { url: "/favicon/dark/favicon.ico" },
-  //     {
-  //       media: "(prefers-color-scheme: light)",
-  //       url: "/favicon/light/favicon.ico",
-  //     },
-  //     {
-  //       media: "(prefers-color-scheme: dark)",
-  //       url: "/favicon/dark/favicon.ico",
-  //     },
-  //   ],
-  // },
+  icons: {
+    icon: [
+      {
+        media: "(prefers-color-scheme: light)",
+        url: "/favicon/light/favicon.ico",
+      },
+      {
+        media: "(prefers-color-scheme: dark)",
+        url: "/favicon/dark/favicon.ico",
+      },
+    ],
+  },
   robots: {
     index: false,
     follow: false,
