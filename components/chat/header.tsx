@@ -9,6 +9,14 @@ import {
   DropdownMenu,
   DropdownTrigger,
 } from "@heroui/dropdown";
+import {
+  Modal,
+  ModalContent,
+  ModalHeader,
+  ModalBody,
+  ModalFooter,
+  useDisclosure,
+} from "@heroui/modal";
 import { useEffect, useState } from "react";
 
 import { useChat } from "@/zustand/chat";
@@ -18,10 +26,7 @@ import { Id } from "@/convex/_generated/dataModel";
 export default function ChatHeader() {
   const { activeChat, clearActiveChat } = useChat();
 
-  const [mounted, setMounted] = useState(false);
-
   const currentUser = useQuery(api.users.getCurrentUser);
-  const deleteChat = useMutation(api.chats.deleteChat);
 
   const interlocutorSelector = activeChat?.participants.find(
     (p) => p !== currentUser?._id,
@@ -29,10 +34,6 @@ export default function ChatHeader() {
   const interlocutor = useQuery(api.users.getUserById, {
     id: interlocutorSelector as Id<"users">,
   });
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <div className={`p-4`}>
@@ -96,31 +97,90 @@ export default function ChatHeader() {
             <Search size={20} />
           </Button>
 
-          {mounted && (
-            <Dropdown placement="bottom-end">
-              <DropdownTrigger>
-                <Button isIconOnly radius="full" variant="light">
-                  <EllipsisVertical />
-                </Button>
-              </DropdownTrigger>
-              <DropdownMenu aria-label="Menu">
-                <DropdownItem
-                  key="remove"
-                  className="text-danger"
-                  color="danger"
-                  startContent={<Trash2 size={20} />}
-                  onPress={() => {
-                    deleteChat({ _id: activeChat?._id as Id<"chats"> });
-                    clearActiveChat();
-                  }}
-                >
-                  Remove conversation
-                </DropdownItem>
-              </DropdownMenu>
-            </Dropdown>
-          )}
+          <Options />
         </div>
       </div>
     </div>
+  );
+}
+
+function Options() {
+  const { activeChat, clearActiveChat } = useChat();
+  const { isOpen, onOpen, onOpenChange } = useDisclosure();
+
+  const [mounted, setMounted] = useState(false);
+
+  const deleteChat = useMutation(api.chats.deleteChat);
+
+  const handleRemove = () => {
+    deleteChat({ _id: activeChat?._id as Id<"chats"> });
+    clearActiveChat();
+  };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  return (
+    <>
+      {mounted && (
+        <>
+          <Dropdown placement="bottom-end">
+            <DropdownTrigger>
+              <Button isIconOnly radius="full" variant="light">
+                <EllipsisVertical />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Menu">
+              <DropdownItem
+                key="remove"
+                className="text-danger"
+                color="danger"
+                startContent={<Trash2 size={20} />}
+                onPress={onOpen}
+              >
+                Remove conversation
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+
+          <Modal
+            backdrop="blur"
+            isDismissable={false}
+            isKeyboardDismissDisabled={false}
+            isOpen={isOpen}
+            onOpenChange={onOpenChange}
+          >
+            <ModalContent>
+              {(onClose) => (
+                <>
+                  <ModalHeader className="flex flex-col gap-1">
+                    <h3 className="text-2xl font-bold">Remove conversation</h3>
+                  </ModalHeader>
+                  <ModalBody>
+                    <p>
+                      Are you sure you want to remove this conversation? This
+                      action is irreversible.
+                    </p>
+                    <p>
+                      This will permanently delete the conversation for you and
+                      the other participant.
+                    </p>
+                  </ModalBody>
+                  <ModalFooter>
+                    <Button color="default" variant="light" onPress={onClose}>
+                      Close
+                    </Button>
+                    <Button color="danger" onPress={handleRemove}>
+                      Yes, remove
+                    </Button>
+                  </ModalFooter>
+                </>
+              )}
+            </ModalContent>
+          </Modal>
+        </>
+      )}
+    </>
   );
 }

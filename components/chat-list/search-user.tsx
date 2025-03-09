@@ -16,7 +16,7 @@ import { arraysEqual } from "@/helper/arrays-equal";
 export default function SearchUser() {
   // Zustand
   const { open, setOpen, query, setQuery } = useSearchUser();
-  const { setActiveChat } = useChat();
+  const { activeChat, setActiveChat } = useChat();
 
   // React
   const [isAdded, setIsAdded] = useState<Chat>();
@@ -50,6 +50,12 @@ export default function SearchUser() {
       setActiveChat(chatData as Chat);
     }
   }, [isAdded, chats]);
+
+  useEffect(() => {
+    if (activeChat) {
+      setIsAdded(undefined);
+    }
+  }, [activeChat]);
 
   return (
     <div

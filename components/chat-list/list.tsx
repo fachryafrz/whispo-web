@@ -48,11 +48,7 @@ export default function List() {
         <ul className={`h-full overflow-y-auto`}>
           {chats
             ?.filter((chat) => chat.lastMessage)
-            .sort((a, b) =>
-              b.lastMessageTime && a.lastMessageTime
-                ? b.lastMessageTime - a.lastMessageTime
-                : b._creationTime - a._creationTime,
-            )
+            .sort((a, b) => b.lastMessageTime! - a.lastMessageTime!)
             .map((chat) => (
               <li key={chat._id}>
                 <ChatListCard chat={chat} />
@@ -98,11 +94,7 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
           ? (interlocutor?.avatarUrl ?? "")
           : (chat.imageUrl ?? "")
       }
-      timeSent={
-        chat.lastMessageTime
-          ? dayjs(chat.lastMessageTime).format("HH:mm")
-          : dayjs(chat._creationTime).format("HH:mm")
-      }
+      timeSent={dayjs(chat.lastMessageTime).format("HH:mm")}
       title={
         chat.type === "private" ? (interlocutor?.name ?? "") : (chat.name ?? "")
       }
