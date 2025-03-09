@@ -118,8 +118,8 @@ function Message({
             <div
               className={`prose text-sm ${
                 msg.sender === currentUser?._id
-                  ? "prose-a:text-black dark:prose-a:text-white dark:prose-blockquote:text-white prose-code:dark:text-white text-black marker:text-black dark:text-white dark:marker:text-white"
-                  : "prose-a:text-white dark:prose-a:text-black dark:prose-blockquote:text-black prose-code:dark:text-black text-white marker:text-white dark:text-black dark:marker:text-black"
+                  ? "text-black marker:text-black prose-a:text-black dark:text-white dark:marker:text-white dark:prose-a:text-white dark:prose-blockquote:text-white prose-code:dark:text-white"
+                  : "text-white marker:text-white prose-a:text-white dark:text-black dark:marker:text-black dark:prose-a:text-black dark:prose-blockquote:text-black prose-code:dark:text-black"
               }`}
               style={{
                 wordBreak: "break-word",
@@ -178,7 +178,7 @@ function ReplyTo({ msg }: { msg: Doc<"messages"> }) {
   return (
     <>
       {getMessage ? (
-        <div className="pointer-events-none space-y-1 rounded-md bg-white p-2 text-xs dark:bg-black">
+        <div className="pointer-events-none space-y-1 rounded-md bg-white p-2 text-xs text-black dark:bg-black dark:text-white">
           {/* Title */}
           <div>
             Reply to <strong>{getMessage?.sender?.username}</strong>

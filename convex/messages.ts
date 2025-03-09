@@ -19,7 +19,7 @@ export const getMessagesByChatId = query({
       .query("messages")
       .withIndex("by_chat", (q) => q.eq("chat", args.chatId))
       .order("desc")
-      .take(10);
+      .take(20);
   },
 });
 
