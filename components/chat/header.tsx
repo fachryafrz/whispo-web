@@ -65,7 +65,7 @@ export default function ChatHeader() {
         {/* Content */}
         <div className="min-w-0 flex-1">
           {/* Name */}
-          <h2 className="text-small font-bold">
+          <h2 className="text-small font-bold line-clamp-1">
             {activeChat?.type === "private"
               ? interlocutor?.name
               : activeChat?.name}
@@ -112,7 +112,7 @@ function Options() {
 
   const deleteChat = useMutation(api.chats.deleteChat);
 
-  const handleRemove = () => {
+  const handleDelete = () => {
     deleteChat({ _id: activeChat?._id as Id<"chats"> });
     clearActiveChat();
   };
@@ -133,13 +133,13 @@ function Options() {
             </DropdownTrigger>
             <DropdownMenu aria-label="Menu">
               <DropdownItem
-                key="remove"
+                key="delete"
                 className="text-danger"
                 color="danger"
                 startContent={<Trash2 size={20} />}
                 onPress={onOpen}
               >
-                Remove conversation
+                Delete
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>
@@ -155,11 +155,11 @@ function Options() {
               {(onClose) => (
                 <>
                   <ModalHeader className="flex flex-col gap-1">
-                    <h3 className="text-2xl font-bold">Remove conversation</h3>
+                    <h3 className="text-2xl font-bold">Delete conversation</h3>
                   </ModalHeader>
                   <ModalBody>
                     <p>
-                      Are you sure you want to remove this conversation? This
+                      Are you sure you want to delete this conversation? This
                       action is irreversible.
                     </p>
                     <p>
@@ -171,8 +171,8 @@ function Options() {
                     <Button color="default" variant="light" onPress={onClose}>
                       Close
                     </Button>
-                    <Button color="danger" onPress={handleRemove}>
-                      Yes, remove
+                    <Button color="danger" onPress={handleDelete}>
+                      Yes, delete
                     </Button>
                   </ModalFooter>
                 </>

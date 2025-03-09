@@ -43,8 +43,9 @@ export default function ChatInput() {
     });
   };
 
+  // TODO: on mobile enter is add new line, on desktop enter is send
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && window.innerWidth >= 768) {
       e.preventDefault();
       formRef.current?.requestSubmit();
     }
@@ -56,7 +57,7 @@ export default function ChatInput() {
 
   return (
     <div className={`p-2`}>
-      <form ref={formRef} className="flex gap-2" onSubmit={sendMessage}>
+      <form ref={formRef} className="flex items-end gap-2" onSubmit={sendMessage}>
         <Button
           isIconOnly
           radius="full"
