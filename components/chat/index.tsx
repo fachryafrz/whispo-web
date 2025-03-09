@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 import ChatHeader from "./header";
 import ChatMessages from "./messages";
@@ -10,14 +10,6 @@ import { useChat } from "@/zustand/chat";
 
 export default function Chat() {
   const { activeChat, clearActiveChat } = useChat();
-
-  const [messages, setMessages] = useState<string[]>([]);
-
-  const sendMessage = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    setMessages((prev) => [`Message ${prev.length}`, ...prev]); // Tambah ke awal array
-  };
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -43,10 +35,10 @@ export default function Chat() {
           <ChatHeader />
 
           {/* Chat */}
-          <ChatMessages messages={messages} />
+          <ChatMessages />
 
           {/* Input */}
-          <ChatInput onSubmit={sendMessage} />
+          <ChatInput />
         </section>
       ) : (
         <section

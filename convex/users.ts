@@ -15,7 +15,8 @@ export const getCurrentUser = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Not authenticated");
+      // throw new Error("Not authenticated");
+      return;
     }
 
     const user = await ctx.db
@@ -30,6 +31,16 @@ export const getCurrentUser = query({
     }
 
     return user;
+  },
+});
+
+export const getUserById = query({
+  args: { id: v.id("users") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("users")
+      .withIndex("by_id", (q) => q.eq("_id", args.id))
+      .first();
   },
 });
 
@@ -60,7 +71,8 @@ export const store = mutation({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Not authenticated");
+      // throw new Error("Not authenticated");
+      return;
     }
 
     // Check if we've already stored this identity before.

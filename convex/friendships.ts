@@ -12,11 +12,7 @@ export const get = query({
 
 export const store = mutation({
   handler: async (ctx, args: Friendship) => {
-    return await ctx.db.insert("friendships", {
-      user1: args.user1,
-      user2: args.user2,
-      status: args.status,
-    });
+    return await ctx.db.insert("friendships", args);
   },
 });
 

@@ -7,13 +7,9 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 };
 
 export type Chat = {
+  _id?: Id<"chats">;
   type: "private" | "group";
-  participants: {
-    id: Id<"users">;
-    name: string;
-    username: string;
-    imageUrl: string;
-  }[];
+  participants: Id<"users">[];
   name?: string; // For group chats
   description?: string; // For group chats
   imageUrl?: string; // For group chats
@@ -26,6 +22,7 @@ export type Chat = {
 };
 
 export type Message = {
+  _id?: Id<"messages">;
   chat: Id<"chats">;
   sender: Id<"users">;
   content: string;
@@ -34,6 +31,7 @@ export type Message = {
 };
 
 export type Friendship = {
+  _id?: Id<"friendships">;
   user1: Id<"users">;
   user2: Id<"users">;
   status: "pending" | "accepted" | "rejected";

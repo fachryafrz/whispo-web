@@ -1,3 +1,5 @@
+import { v } from "convex/values";
+
 import { mutation, query } from "./_generated/server";
 
 import { Message } from "@/types";
@@ -9,14 +11,21 @@ export const get = query({
   },
 });
 
+export const getMessagesByChatId = query({
+  args: { chatId: v.id("chats") },
+  handler: async (ctx, args) => {
+    return await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chat", args.chatId))
+      .order("desc")
+      .collect();
+  },
+});
+
 export const store = mutation({
   handler: async (ctx, args: Message) => {
-    return await ctx.db.insert("messages", {
-      chat: args.chat,
-      sender: args.sender,
-      content: args.content,
-      mediaUrl: args.mediaUrl,
-      readBy: args.readBy,
-    });
+    if (!args.sender || !args.chat || !args.content) return;
+
+    return await ctx.db.insert("messages", args);
   },
 });

@@ -1,3 +1,5 @@
+import { v } from "convex/values";
+
 import { mutation, query } from "./_generated/server";
 
 import { arraysEqual } from "@/helper/arrays-equal";
@@ -16,14 +18,24 @@ export const getChatsByCurrentUser = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Not authenticated");
+      // throw new Error("Not authenticated");
+      return;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
     }
 
     const allChats = await ctx.db.query("chats").collect();
     const userChats = allChats.filter((chat) =>
-      chat.participants.some(
-        (participant) => participant.username === identity.nickname,
-      ),
+      chat.participants.some((participant) => participant === user._id),
     );
 
     return userChats;
@@ -32,16 +44,33 @@ export const getChatsByCurrentUser = query({
 
 export const store = mutation({
   handler: async (ctx, args: Chat) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      // throw new Error("Not authenticated");
+      return;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .first();
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
     const existingChats = await ctx.db
       .query("chats")
       .withIndex("by_type", (q) => q.eq("type", args.type))
       .collect(); // Ambil semua chat dengan tipe yang sama
 
-    // Filter manual untuk cek apakah `participants` sama persis
     const existingChat = existingChats.find((chat) =>
       arraysEqual(
-        chat.participants.map((p) => p.id),
-        args.participants.map((p) => p.id),
+        chat.participants.map((p) => p),
+        args.participants.map((p) => p),
       ),
     );
 
@@ -52,5 +81,22 @@ export const store = mutation({
     }
 
     return await ctx.db.insert("chats", args);
+  },
+});
+
+export const deleteChat = mutation({
+  args: { _id: v.id("chats") },
+  handler: async (ctx, args) => {
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chat", args._id))
+      .order("desc")
+      .collect();
+
+    for (const message of messages) {
+      await ctx.db.delete(message._id);
+    }
+
+    return await ctx.db.delete(args._id);
   },
 });
