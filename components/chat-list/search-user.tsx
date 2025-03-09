@@ -2,6 +2,7 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { ArrowLeft } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
+import { useEffect, useState } from "react";
 
 import ChatCard from "./card";
 
@@ -10,13 +11,18 @@ import { api } from "@/convex/_generated/api";
 import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { Chat } from "@/types";
+import { arraysEqual } from "@/helper/arrays-equal";
 
 export default function SearchUser() {
   // Zustand
   const { open, setOpen, query, setQuery } = useSearchUser();
   const { setActiveChat } = useChat();
 
+  // React
+  const [isAdded, setIsAdded] = useState<Chat>();
+
   // Convex
+  const chats = useQuery(api.chats.getChatsByCurrentUser);
   const currentUser = useQuery(api.users.getCurrentUser);
   const users = useQuery(api.users.searchByUsername, {
     usernameQuery: query,
@@ -31,8 +37,19 @@ export default function SearchUser() {
     };
 
     storeChat(value);
-    setActiveChat(value);
+    setIsAdded(value);
+    // setActiveChat(value);
   };
+
+  useEffect(() => {
+    if (isAdded) {
+      const chatData = chats?.find((chat) =>
+        arraysEqual(chat.participants, isAdded?.participants as Id<"users">[]),
+      );
+
+      setActiveChat(chatData as Chat);
+    }
+  }, [isAdded, chats]);
 
   return (
     <div

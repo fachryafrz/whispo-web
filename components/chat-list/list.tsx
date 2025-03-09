@@ -78,6 +78,7 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
 
   const handleSelectChat = () => {
     const value: Chat = {
+      _id: chat._id,
       type: chat.type as "private" | "group",
       participants: [
         interlocutor?._id as Id<"users">,

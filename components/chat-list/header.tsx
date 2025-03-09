@@ -62,16 +62,22 @@ export default function ChatListHeader() {
               </Button>
             </DropdownTrigger>
             <DropdownMenu aria-label="Menu">
-              <DropdownItem key="toggle-theme" onPress={onChange}>
-                <div className={`flex items-center gap-2`}>
-                  {resolvedTheme === "light" ? <Moon /> : <Sun />}
-                  <span>
-                    {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
-                  </span>
-                </div>
+              <DropdownItem
+                key="toggle-theme"
+                startContent={
+                  resolvedTheme === "light" ? (
+                    <Moon size={20} />
+                  ) : (
+                    <Sun size={20} />
+                  )
+                }
+                onPress={onChange}
+              >
+                {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
               </DropdownItem>
               <DropdownItem
                 key="settings"
+                startContent={<Settings size={20} />}
                 onPress={() =>
                   addToast({
                     title: "Settings",
@@ -81,10 +87,7 @@ export default function ChatListHeader() {
                   })
                 }
               >
-                <div className={`flex items-center gap-2`}>
-                  <Settings />
-                  <span>Settings</span>
-                </div>
+                Settings
               </DropdownItem>
             </DropdownMenu>
           </Dropdown>

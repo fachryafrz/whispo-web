@@ -1,16 +1,27 @@
 import { Button } from "@heroui/button";
 import { Image } from "@heroui/image";
 import { addToast } from "@heroui/toast";
-import { ArrowLeft, Search } from "lucide-react";
-import { useQuery } from "convex/react";
+import { ArrowLeft, EllipsisVertical, Search, Trash2 } from "lucide-react";
+import { useMutation, useQuery } from "convex/react";
+import {
+  Dropdown,
+  DropdownItem,
+  DropdownMenu,
+  DropdownTrigger,
+} from "@heroui/dropdown";
+import { useEffect, useState } from "react";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 export default function ChatHeader() {
-  const { activeChat, setActiveChat, clearActiveChat } = useChat();
+  const { activeChat, clearActiveChat } = useChat();
+
+  const [mounted, setMounted] = useState(false);
+
   const currentUser = useQuery(api.users.getCurrentUser);
+  const deleteChat = useMutation(api.chats.deleteChat);
 
   const interlocutorSelector = activeChat?.participants.find(
     (p) => p !== currentUser?._id,
@@ -18,6 +29,10 @@ export default function ChatHeader() {
   const interlocutor = useQuery(api.users.getUserById, {
     id: interlocutorSelector as Id<"users">,
   });
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className={`p-4`}>
@@ -64,7 +79,7 @@ export default function ChatHeader() {
         </div>
 
         {/* CTA */}
-        <div className="flex flex-col items-end gap-1">
+        <div className="flex items-end gap-1">
           <Button
             isIconOnly
             radius="full"
@@ -80,6 +95,30 @@ export default function ChatHeader() {
           >
             <Search size={20} />
           </Button>
+
+          {mounted && (
+            <Dropdown placement="bottom-end">
+              <DropdownTrigger>
+                <Button isIconOnly radius="full" variant="light">
+                  <EllipsisVertical />
+                </Button>
+              </DropdownTrigger>
+              <DropdownMenu aria-label="Menu">
+                <DropdownItem
+                  key="remove"
+                  className="text-danger"
+                  color="danger"
+                  startContent={<Trash2 size={20} />}
+                  onPress={() => {
+                    deleteChat({ _id: activeChat?._id as Id<"chats"> });
+                    clearActiveChat();
+                  }}
+                >
+                  Remove conversation
+                </DropdownItem>
+              </DropdownMenu>
+            </Dropdown>
+          )}
         </div>
       </div>
     </div>

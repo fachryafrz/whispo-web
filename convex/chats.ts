@@ -1,3 +1,4 @@
+import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 
@@ -17,7 +18,8 @@ export const getChatsByCurrentUser = query({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Not authenticated");
+      // throw new Error("Not authenticated");
+      return;
     }
 
     const user = await ctx.db
@@ -45,7 +47,8 @@ export const store = mutation({
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
-      throw new Error("Not authenticated");
+      // throw new Error("Not authenticated");
+      return;
     }
 
     const user = await ctx.db
@@ -78,5 +81,22 @@ export const store = mutation({
     }
 
     return await ctx.db.insert("chats", args);
+  },
+});
+
+export const deleteChat = mutation({
+  args: { _id: v.id("chats") },
+  handler: async (ctx, args) => {
+    const messages = await ctx.db
+      .query("messages")
+      .withIndex("by_chat", (q) => q.eq("chat", args._id))
+      .order("desc")
+      .collect();
+
+    for (const message of messages) {
+      await ctx.db.delete(message._id);
+    }
+
+    return await ctx.db.delete(args._id);
   },
 });
