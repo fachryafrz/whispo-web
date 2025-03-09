@@ -33,7 +33,7 @@ export default function ChatInput() {
       chat: activeChat?._id as Id<"chats">,
       sender: currentUser?._id as Id<"users">,
       content: text,
-      replyTo: replyMessageId as Id<"messages"> || undefined,
+      replyTo: (replyMessageId as Id<"messages">) || undefined,
     }).then(() => {
       setText("");
       clearReplyTo();
@@ -117,19 +117,16 @@ function ReplyTo() {
   const getMessage = useQuery(api.messages.getMessageById, {
     _id: replyMessageId as Id<"messages">,
   });
-  const getUserOfMessage = useQuery(api.users.getUserById, {
-    _id: getMessage?.sender as Id<"users">,
-  });
 
   return (
     <>
-      {getMessage && getUserOfMessage && (
+      {getMessage && (
         <div className="flex items-center gap-2">
           {/* Reply info */}
           <div className="pointer-events-none ml-12 flex-1 space-y-1 rounded-md bg-default p-2 text-xs">
             {/* Title */}
             <span className="block font-semibold">
-              Reply to {getUserOfMessage?.username}
+              Reply to {getMessage?.sender?.username}
             </span>
 
             {/* Content */}

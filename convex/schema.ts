@@ -38,6 +38,10 @@ export default defineSchema({
     readBy: v.optional(v.array(v.id("users"))),
     editedBy: v.optional(v.id("users")),
     replyTo: v.optional(v.id("messages")),
+    deletedBy: v.optional(v.id("users")),
+    deletedAt: v.optional(v.number()),
+    unsentBy: v.optional(v.id("users")),
+    unsentAt: v.optional(v.number()),
   }).index("by_chat", ["chat"]),
 
   friendships: defineTable({

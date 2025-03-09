@@ -42,6 +42,27 @@ export const getChatsByCurrentUser = query({
   },
 });
 
+export const getChatById = query({
+  args: { _id: v.id("chats") },
+  handler: async (ctx, args) => {
+    const chat = await ctx.db
+      .query("chats")
+      .withIndex("by_id", (q) => q.eq("_id", args._id))
+      .first();
+
+    const participants = await Promise.all(
+      chat?.participants.map((p) =>
+        ctx.db
+          .query("users")
+          .withIndex("by_id", (q) => q.eq("_id", p))
+          .first(),
+      ) || [],
+    );
+
+    return { ...chat, participants };
+  },
+});
+
 export const store = mutation({
   handler: async (ctx, args: Chat) => {
     const identity = await ctx.auth.getUserIdentity();

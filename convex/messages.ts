@@ -1,6 +1,7 @@
 import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
+import { Id } from "./_generated/dataModel";
 
 import { Message } from "@/types";
 
@@ -23,12 +24,21 @@ export const getMessagesByChatId = query({
 });
 
 export const getMessageById = query({
-  args: { _id: v.id("messages") },
+  args: { _id: v.optional(v.id("messages")) },
   handler: async (ctx, args) => {
-    return await ctx.db
+    if (!args._id) return;
+
+    const message = await ctx.db
       .query("messages")
-      .withIndex("by_id", (q) => q.eq("_id", args._id))
+      .withIndex("by_id", (q) => q.eq("_id", args._id as Id<"messages">))
       .first();
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_id", (q) => q.eq("_id", message?.sender as Id<"users">))
+      .first();
+
+    return { ...message, sender: user };
   },
 });
 
@@ -51,8 +61,11 @@ export const editMessage = mutation({
 });
 
 export const unsendMessage = mutation({
-  args: { _id: v.id("messages") },
+  args: { _id: v.id("messages"), unsentBy: v.id("users") },
   handler: async (ctx, args) => {
-    return await ctx.db.delete(args._id);
+    return await ctx.db.patch(args._id, {
+      unsentBy: args.unsentBy,
+      unsentAt: Date.now(),
+    });
   },
 });

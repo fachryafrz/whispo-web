@@ -63,13 +63,12 @@ export default function List() {
 function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
   const { setActiveChat } = useChat();
   const currentUser = useQuery(api.users.getCurrentUser);
+  const chatById = useQuery(api.chats.getChatById, { _id: chat._id });
 
-  const interlocutorSelector = chat.participants.find(
-    (p) => p !== currentUser?._id,
+  const interlocutor = chatById?.participants.find(
+    (p) => p?._id !== currentUser?._id,
   );
-  const interlocutor = useQuery(api.users.getUserById, {
-    _id: interlocutorSelector as Id<"users">,
-  });
+
   const storeChat = useMutation(api.chats.store);
 
   const handleSelectChat = () => {
@@ -87,18 +86,24 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
   };
 
   return (
-    <ChatCard
-      description={`${chat.lastMessageSender === currentUser?._id ? "You: " : ""} ${chat.lastMessage}`}
-      imageUrl={
-        chat.type === "private"
-          ? (interlocutor?.avatarUrl ?? "")
-          : (chat.imageUrl ?? "")
-      }
-      timeSent={dayjs(chat.lastMessageTime).format("HH:mm")}
-      title={
-        chat.type === "private" ? (interlocutor?.name ?? "") : (chat.name ?? "")
-      }
-      onPress={() => handleSelectChat()}
-    />
+    <>
+      {interlocutor && (
+        <ChatCard
+          description={`${chat.lastMessageSender === currentUser?._id ? "You: " : ""} ${chat.lastMessage}`}
+          imageUrl={
+            chat.type === "private"
+              ? (interlocutor?.avatarUrl ?? "")
+              : (chat.imageUrl ?? "")
+          }
+          timeSent={dayjs(chat.lastMessageTime).format("HH:mm")}
+          title={
+            chat.type === "private"
+              ? (interlocutor?.name ?? "")
+              : (chat.name ?? "")
+          }
+          onPress={() => handleSelectChat()}
+        />
+      )}
+    </>
   );
 }

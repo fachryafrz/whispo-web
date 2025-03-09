@@ -30,6 +30,10 @@ export type Message = {
   readBy?: Id<"users">[];
   editedBy?: Id<"users">;
   replyTo?: Id<"messages">;
+  deletedBy?: Id<"users">;
+  deletedAt?: number;
+  unsentBy?: Id<"users">;
+  unsentAt?: number;
 };
 
 export type Friendship = {

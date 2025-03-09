@@ -118,8 +118,8 @@ function Message({
             <div
               className={`prose text-sm ${
                 msg.sender === currentUser?._id
-                  ? "prose-a:text-black dark:prose-a:text-white prose-code:dark:text-white text-black marker:text-black dark:text-white dark:marker:text-white"
-                  : "prose-a:text-white dark:prose-a:text-black prose-code:dark:text-black text-white marker:text-white dark:text-black dark:marker:text-black"
+                  ? "prose-a:text-black dark:prose-a:text-white dark:prose-blockquote:text-white prose-code:dark:text-white text-black marker:text-black dark:text-white dark:marker:text-white"
+                  : "prose-a:text-white dark:prose-a:text-black dark:prose-blockquote:text-black prose-code:dark:text-black text-white marker:text-white dark:text-black dark:marker:text-black"
               }`}
               style={{
                 wordBreak: "break-word",
@@ -136,7 +136,7 @@ function Message({
                 }}
                 remarkPlugins={[remarkGfm]}
               >
-                {msg.content}
+                {msg.unsentBy ? `_message was unsent_` : msg.content}
               </ReactMarkdown>
             </div>
 
@@ -169,21 +169,19 @@ function Message({
   );
 }
 
+// TODO: Condition replying to deleted message
 function ReplyTo({ msg }: { msg: Doc<"messages"> }) {
   const getMessage = useQuery(api.messages.getMessageById, {
     _id: msg.replyTo as Id<"messages">,
   });
-  const getUserOfMessage = useQuery(api.users.getUserById, {
-    _id: getMessage?.sender as Id<"users">,
-  });
 
   return (
     <>
-      {getMessage && getUserOfMessage && (
+      {getMessage ? (
         <div className="pointer-events-none space-y-1 rounded-md bg-white p-2 text-xs dark:bg-black">
           {/* Title */}
           <div>
-            Reply to <strong>{getUserOfMessage?.username}</strong>
+            Reply to <strong>{getMessage?.sender?.username}</strong>
           </div>
 
           {/* Content */}
@@ -195,6 +193,8 @@ function ReplyTo({ msg }: { msg: Doc<"messages"> }) {
             {getMessage?.content}
           </p>
         </div>
+      ) : (
+        <div className="h-[52px] rounded-md bg-white p-2 text-xs dark:bg-black" />
       )}
     </>
   );
@@ -286,6 +286,7 @@ function MessageOptions({ msg }: { msg: Doc<"messages"> }) {
                     onPress={() => {
                       unsendMessage({
                         _id: msg._id as Id<"messages">,
+                        unsentBy: currentUser?._id as Id<"users">,
                       });
                     }}
                   >

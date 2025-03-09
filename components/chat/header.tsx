@@ -27,13 +27,13 @@ export default function ChatHeader() {
   const { activeChat, clearActiveChat } = useChat();
 
   const currentUser = useQuery(api.users.getCurrentUser);
-
-  const interlocutorSelector = activeChat?.participants.find(
-    (p) => p !== currentUser?._id,
-  );
-  const interlocutor = useQuery(api.users.getUserById, {
-    _id: interlocutorSelector as Id<"users">,
+  const chatById = useQuery(api.chats.getChatById, {
+    _id: activeChat?._id as Id<"chats">,
   });
+
+  const interlocutor = chatById?.participants.find(
+    (p) => p?._id !== currentUser?._id,
+  );
 
   return (
     <div className={`p-4`}>
@@ -65,7 +65,7 @@ export default function ChatHeader() {
         {/* Content */}
         <div className="min-w-0 flex-1">
           {/* Name */}
-          <h2 className="text-small font-bold line-clamp-1">
+          <h2 className="line-clamp-1 text-small font-bold">
             {activeChat?.type === "private"
               ? interlocutor?.name
               : activeChat?.name}
