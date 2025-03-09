@@ -19,7 +19,7 @@ export default function ChatCard({
   description = "...",
   imageUrl,
   info = true,
-  timeSent, // TODO: Example: 12:00
+  timeSent,
   unreadCount, // TODO: Example: 53
   pinned, // TODO: Example: true
   onPress,

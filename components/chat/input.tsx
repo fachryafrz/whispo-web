@@ -2,15 +2,18 @@ import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "convex/react";
-import { Paperclip, SendHorizontal } from "lucide-react";
+import { Paperclip, SendHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { handleKeyDown } from "@/utils/handle-textarea-key-down";
+import { useReplyMessage } from "@/zustand/reply-message";
 
 export default function ChatInput() {
   const { activeChat } = useChat();
+  const { replyMessageId, clearReplyTo } = useReplyMessage();
 
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -30,8 +33,10 @@ export default function ChatInput() {
       chat: activeChat?._id as Id<"chats">,
       sender: currentUser?._id as Id<"users">,
       content: text,
+      replyTo: replyMessageId as Id<"messages"> || undefined,
     }).then(() => {
       setText("");
+      clearReplyTo();
       textareaRef.current?.focus();
     });
 
@@ -43,21 +48,23 @@ export default function ChatInput() {
     });
   };
 
-  // TODO: on mobile enter is add new line, on desktop enter is send
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (e.key === "Enter" && !e.shiftKey && window.innerWidth >= 768) {
-      e.preventDefault();
-      formRef.current?.requestSubmit();
-    }
-  };
-
   useEffect(() => {
     setText("");
+    clearReplyTo();
   }, [activeChat]);
 
   return (
-    <div className={`p-2`}>
-      <form ref={formRef} className="flex items-end gap-2" onSubmit={sendMessage}>
+    <div className={`space-y-2 p-2`}>
+      {/* Reply to */}
+      {replyMessageId && <ReplyTo />}
+
+      {/* Message input */}
+      <form
+        ref={formRef}
+        className="flex items-end gap-2"
+        onSubmit={sendMessage}
+      >
+        {/* Attachments */}
         <Button
           isIconOnly
           radius="full"
@@ -73,6 +80,8 @@ export default function ChatInput() {
         >
           <Paperclip size={20} />
         </Button>
+
+        {/* Message */}
         <Textarea
           ref={textareaRef}
           minRows={1}
@@ -81,9 +90,14 @@ export default function ChatInput() {
           value={text}
           onChange={(e) => setText(e.target.value)}
           onKeyDown={(e) =>
-            handleKeyDown(e as React.KeyboardEvent<HTMLTextAreaElement>)
+            handleKeyDown(
+              e as React.KeyboardEvent<HTMLTextAreaElement>,
+              formRef,
+            )
           }
         />
+
+        {/* Send */}
         <Button
           isIconOnly
           className="bg-black text-white dark:bg-white dark:text-black"
@@ -94,5 +108,45 @@ export default function ChatInput() {
         </Button>
       </form>
     </div>
+  );
+}
+
+function ReplyTo() {
+  const { replyMessageId, clearReplyTo } = useReplyMessage();
+
+  const getMessage = useQuery(api.messages.getMessageById, {
+    _id: replyMessageId as Id<"messages">,
+  });
+  const getUserOfMessage = useQuery(api.users.getUserById, {
+    _id: getMessage?.sender as Id<"users">,
+  });
+
+  return (
+    <>
+      {getMessage && getUserOfMessage && (
+        <div className="flex items-center gap-2">
+          {/* Reply info */}
+          <div className="pointer-events-none ml-12 flex-1 space-y-1 rounded-md bg-default p-2 text-xs">
+            {/* Title */}
+            <span className="block font-semibold">
+              Reply to {getUserOfMessage?.username}
+            </span>
+
+            {/* Content */}
+            <span className="block">{getMessage?.content}</span>
+          </div>
+
+          {/* Clear */}
+          <Button
+            isIconOnly
+            radius="full"
+            variant="light"
+            onPress={clearReplyTo}
+          >
+            <X size={20} />
+          </Button>
+        </div>
+      )}
+    </>
   );
 }

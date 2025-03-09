@@ -36,6 +36,8 @@ export default defineSchema({
     content: v.string(),
     mediaUrl: v.optional(v.string()),
     readBy: v.optional(v.array(v.id("users"))),
+    editedBy: v.optional(v.id("users")),
+    replyTo: v.optional(v.id("messages")),
   }).index("by_chat", ["chat"]),
 
   friendships: defineTable({

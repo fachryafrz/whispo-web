@@ -35,11 +35,11 @@ export const getCurrentUser = query({
 });
 
 export const getUserById = query({
-  args: { id: v.id("users") },
+  args: { _id: v.id("users") },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("users")
-      .withIndex("by_id", (q) => q.eq("_id", args.id))
+      .withIndex("by_id", (q) => q.eq("_id", args._id))
       .first();
   },
 });

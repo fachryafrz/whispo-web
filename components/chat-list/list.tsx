@@ -68,7 +68,7 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
     (p) => p !== currentUser?._id,
   );
   const interlocutor = useQuery(api.users.getUserById, {
-    id: interlocutorSelector as Id<"users">,
+    _id: interlocutorSelector as Id<"users">,
   });
   const storeChat = useMutation(api.chats.store);
 

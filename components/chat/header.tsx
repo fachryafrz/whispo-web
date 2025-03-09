@@ -32,7 +32,7 @@ export default function ChatHeader() {
     (p) => p !== currentUser?._id,
   );
   const interlocutor = useQuery(api.users.getUserById, {
-    id: interlocutorSelector as Id<"users">,
+    _id: interlocutorSelector as Id<"users">,
   });
 
   return (

@@ -28,6 +28,8 @@ export type Message = {
   content: string;
   mediaUrl?: string;
   readBy?: Id<"users">[];
+  editedBy?: Id<"users">;
+  replyTo?: Id<"messages">;
 };
 
 export type Friendship = {
