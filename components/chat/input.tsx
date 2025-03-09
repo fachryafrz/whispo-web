@@ -3,7 +3,7 @@ import { Input } from "@heroui/input";
 import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "convex/react";
 import { Paperclip, SendHorizontal } from "lucide-react";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
@@ -12,11 +12,13 @@ import { Id } from "@/convex/_generated/dataModel";
 export default function ChatInput() {
   const { activeChat } = useChat();
 
+  const inputRef = useRef<HTMLInputElement>(null);
   const [text, setText] = useState<string>();
 
   const currentUser = useQuery(api.users.getCurrentUser);
 
   const storeMessage = useMutation(api.messages.store);
+  const updateChat = useMutation(api.chats.updateChatById);
 
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +27,17 @@ export default function ChatInput() {
       chat: activeChat?._id as Id<"chats">,
       sender: currentUser?._id as Id<"users">,
       content: text as string,
-    }).then(() => setText(""));
+    }).then(() => {
+      setText("");
+      inputRef.current?.focus();
+    });
+
+    updateChat({
+      _id: activeChat?._id as Id<"chats">,
+      lastMessage: text as string,
+      lastMessageSender: currentUser?._id as Id<"users">,
+      lastMessageTime: Date.now(),
+    });
   };
 
   return (
@@ -47,6 +59,7 @@ export default function ChatInput() {
           <Paperclip size={20} />
         </Button>
         <Input
+          ref={inputRef}
           placeholder="Type a message"
           radius="full"
           value={text}

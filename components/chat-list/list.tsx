@@ -44,11 +44,11 @@ export default function List() {
       )}
 
       {/* List of chats */}
-      {/* TODO: Hide if there is no last message */}
       {chats?.length! > 0 && (
         <ul className={`h-full overflow-y-auto`}>
           {chats
-            ?.sort((a, b) =>
+            ?.filter((chat) => chat.lastMessage)
+            .sort((a, b) =>
               b.lastMessageTime && a.lastMessageTime
                 ? b.lastMessageTime - a.lastMessageTime
                 : b._creationTime - a._creationTime,
@@ -92,7 +92,7 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
 
   return (
     <ChatCard
-      description={chat.lastMessage}
+      description={`${chat.lastMessageSender === currentUser?._id ? "You: " : ""} ${chat.lastMessage}`}
       imageUrl={
         chat.type === "private"
           ? (interlocutor?.avatarUrl ?? "")
@@ -100,7 +100,7 @@ function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
       }
       timeSent={
         chat.lastMessageTime
-          ? new Date(chat.lastMessageTime).toString()
+          ? dayjs(chat.lastMessageTime).format("HH:mm")
           : dayjs(chat._creationTime).format("HH:mm")
       }
       title={

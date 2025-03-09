@@ -84,6 +84,18 @@ export const store = mutation({
   },
 });
 
+export const updateChatById = mutation({
+  args: {
+    _id: v.id("chats"),
+    lastMessage: v.optional(v.string()),
+    lastMessageSender: v.optional(v.string()),
+    lastMessageTime: v.optional(v.number()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args._id, args);
+  },
+});
+
 export const deleteChat = mutation({
   args: { _id: v.id("chats") },
   handler: async (ctx, args) => {
