@@ -38,7 +38,6 @@ export default function SearchUser() {
 
     storeChat(value);
     setIsAdded(value);
-    // setActiveChat(value);
   };
 
   useEffect(() => {
