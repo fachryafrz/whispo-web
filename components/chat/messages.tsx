@@ -31,7 +31,7 @@ function Message({ msg }: { msg: Doc<"messages"> }) {
       key={msg._id}
       className={`flex w-full ${msg.sender === currentUser?._id ? "justify-end" : "justify-start"}`}
     >
-      <Card className="w-fit max-w-lg rounded-md bg-black text-white dark:bg-white dark:text-black">
+      <Card className="w-fit max-w-sm rounded-md bg-black text-white dark:bg-white dark:text-black lg:max-w-lg xl:max-w-xl">
         <CardBody className="flex-row overflow-visible p-2">
           {/* <p className="text-sm break-words max-w-full text-wrap">{msg.content}</p> */}
           <p className="max-w-full whitespace-pre-wrap text-sm">
