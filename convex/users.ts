@@ -27,7 +27,8 @@ export const getCurrentUser = query({
       .first();
 
     if (!user) {
-      throw new Error("User not found");
+      // throw new Error("User not found");
+      return;
     }
 
     return user;

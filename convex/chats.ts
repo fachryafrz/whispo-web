@@ -30,7 +30,8 @@ export const getChatsByCurrentUser = query({
       .first();
 
     if (!user) {
-      throw new Error("User not found");
+      // throw new Error("User not found");
+      return [];
     }
 
     const allChats = await ctx.db.query("chats").collect();
@@ -80,7 +81,8 @@ export const store = mutation({
       .first();
 
     if (!user) {
-      throw new Error("User not found");
+      // throw new Error("User not found");
+      return;
     }
 
     const existingChats = await ctx.db
