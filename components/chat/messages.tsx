@@ -1,4 +1,4 @@
-import { useMutation, useQuery } from "convex/react";
+import { useMutation, usePaginatedQuery, useQuery } from "convex/react";
 import dayjs from "dayjs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -30,6 +30,7 @@ import {
 } from "@heroui/modal";
 import { Textarea } from "@heroui/input";
 import { Spinner } from "@heroui/spinner";
+import { useInView } from "react-intersection-observer";
 
 import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
@@ -38,13 +39,23 @@ import { useEditMessage } from "@/zustand/edit-message";
 import { handleKeyDown } from "@/utils/handle-textarea-key-down";
 import { useReplyMessage } from "@/zustand/reply-message";
 
+const NUM_MESSAGES_TO_LOAD = 50;
+
 export default function ChatMessages() {
   const { activeChat } = useChat();
+  const { ref: loadMoreRef, inView, entry } = useInView();
 
   const currentUser = useQuery(api.users.getCurrentUser);
-  const messages = useQuery(api.messages.getMessagesByChatId, {
-    chatId: activeChat?._id as Id<"chats">,
-  });
+
+  const {
+    results: messages,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.messages.getMessagesByChatId,
+    { chatId: activeChat?._id as Id<"chats"> },
+    { initialNumItems: NUM_MESSAGES_TO_LOAD },
+  );
 
   const containerRef = useRef<HTMLDivElement>(null);
   const [showScrollBtn, setShowScrollBtn] = useState<boolean>(false);
@@ -52,6 +63,12 @@ export default function ChatMessages() {
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     setShowScrollBtn(e.currentTarget.scrollTop < 0);
   };
+
+  useEffect(() => {
+    if (inView) {
+      loadMore(NUM_MESSAGES_TO_LOAD);
+    }
+  }, [inView]);
 
   return (
     <div className="relative flex-1 overflow-y-hidden before:absolute before:inset-0 before:bg-[url(/background/doodle.avif)] before:bg-[size:350px] before:bg-repeat before:opacity-10 before:dark:invert">
@@ -108,7 +125,11 @@ export default function ChatMessages() {
           })}
 
         {/* TODO: Paginate messages */}
-        <Spinner color="white" />
+        {status === "CanLoadMore" && (
+          <div ref={loadMoreRef}>
+            <Spinner color="white" />
+          </div>
+        )}
       </div>
     </div>
   );
