@@ -2,6 +2,7 @@ import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Image } from "@heroui/image";
 import { Pin } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 
 type ChatCardProps = {
   title: string;
@@ -51,12 +52,21 @@ export default function ChatCard({
 
           {/* Text */}
           {description && (
-            <p
-              className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500"
-              title={description}
-            >
-              {description}
-            </p>
+            <div className="h-5 overflow-hidden" title={description}>
+              <ReactMarkdown
+                components={{
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  p: ({ node, ...props }) => (
+                    <p
+                      className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500"
+                      {...props}
+                    />
+                  ),
+                }}
+              >
+                {description}
+              </ReactMarkdown>
+            </div>
           )}
         </div>
 

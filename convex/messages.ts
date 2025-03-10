@@ -19,7 +19,7 @@ export const getMessagesByChatId = query({
       .query("messages")
       .withIndex("by_chat", (q) => q.eq("chat", args.chatId))
       .order("desc")
-      .take(20);
+      .take(50);
   },
 });
 
@@ -51,7 +51,11 @@ export const store = mutation({
 });
 
 export const editMessage = mutation({
-  args: { _id: v.id("messages"), content: v.string(), editedBy: v.id("users") },
+  args: {
+    _id: v.id("messages"),
+    content: v.string(),
+    editedBy: v.id("users"),
+  },
   handler: async (ctx, args) => {
     return await ctx.db.patch(args._id, {
       content: args.content,
@@ -61,11 +65,38 @@ export const editMessage = mutation({
 });
 
 export const unsendMessage = mutation({
-  args: { _id: v.id("messages"), unsentBy: v.id("users") },
+  args: {
+    _id: v.id("messages"),
+    unsentBy: v.id("users"),
+    unsentAt: v.number(),
+  },
   handler: async (ctx, args) => {
+    const message = await ctx.db
+      .query("messages")
+      .withIndex("by_id", (q) => q.eq("_id", args._id))
+      .first();
+
+    if (message!._creationTime + 3600000 < Date.now()) {
+      throw new Error("You can only unsend a message within 1 hour");
+    }
+
     return await ctx.db.patch(args._id, {
       unsentBy: args.unsentBy,
-      unsentAt: Date.now(),
+      unsentAt: args.unsentAt,
+    });
+  },
+});
+
+export const deleteMessage = mutation({
+  args: {
+    _id: v.id("messages"),
+    deletedBy: v.array(v.id("users")),
+    deletedAt: v.array(v.number()),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args._id, {
+      deletedBy: args.deletedBy,
+      deletedAt: args.deletedAt,
     });
   },
 });
