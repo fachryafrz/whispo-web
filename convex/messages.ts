@@ -1,4 +1,5 @@
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
@@ -13,18 +14,23 @@ export const get = query({
 });
 
 export const getMessagesByChatId = query({
-  args: { chatId: v.id("chats") },
+  args: {
+    chatId: v.id("chats"),
+    paginationOpts: paginationOptsValidator,
+  },
   handler: async (ctx, args) => {
     return await ctx.db
       .query("messages")
       .withIndex("by_chat", (q) => q.eq("chat", args.chatId))
       .order("desc")
-      .take(50);
+      .paginate(args.paginationOpts);
   },
 });
 
 export const getMessageById = query({
-  args: { _id: v.optional(v.id("messages")) },
+  args: {
+    _id: v.optional(v.id("messages")),
+  },
   handler: async (ctx, args) => {
     if (!args._id) return;
 
