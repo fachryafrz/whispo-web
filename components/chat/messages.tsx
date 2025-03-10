@@ -319,11 +319,8 @@ function MessageOptions({
   const deleteMessage = useMutation(api.messages.deleteMessage);
 
   const [windowWidth, setWindowWidth] = useState(0);
-  const [mounted, setMounted] = useState<boolean>(false);
 
   useEffect(() => {
-    setMounted(true);
-
     const handleResize = () => setWindowWidth(window.innerWidth);
 
     handleResize();
@@ -335,182 +332,177 @@ function MessageOptions({
 
   return (
     <>
-      {mounted && (
-        <>
-          <Dropdown
-            placement={
-              windowWidth >= 1024
-                ? msg.sender === currentUser?._id
-                  ? "left-start"
-                  : "right-start"
-                : "bottom"
-            }
+      <Dropdown
+        placement={
+          windowWidth >= 1024
+            ? msg.sender === currentUser?._id
+              ? "left-start"
+              : "right-start"
+            : "bottom"
+        }
+      >
+        <DropdownTrigger>
+          <Button
+            isIconOnly
+            className="sticky bottom-0"
+            radius="full"
+            variant="light"
           >
-            <DropdownTrigger>
-              <Button
-                isIconOnly
-                className="sticky bottom-0"
-                radius="full"
-                variant="light"
-              >
-                <EllipsisVertical />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Menu">
-              {/* Reply */}
+            <EllipsisVertical />
+          </Button>
+        </DropdownTrigger>
+        <DropdownMenu aria-label="Menu">
+          {/* Reply */}
+          <DropdownItem
+            key="reply"
+            color="default"
+            startContent={<Reply size={20} />}
+            onPress={() => {
+              setReplyMessageId(msg._id);
+            }}
+          >
+            Reply
+          </DropdownItem>
+
+          {msg.sender === currentUser?._id ? (
+            <>
+              {/* Edit */}
               <DropdownItem
-                key="reply"
+                key="edit"
                 color="default"
-                startContent={<Reply size={20} />}
+                startContent={<Pencil size={20} />}
                 onPress={() => {
-                  setReplyMessageId(msg._id);
+                  setMessage(msg.content);
+                  onOpen();
                 }}
               >
-                Reply
+                Edit
               </DropdownItem>
 
-              {msg.sender === currentUser?._id ? (
+              {/* Unsend */}
+              {msg._creationTime + 3600000 > Date.now() && (
                 <>
-                  {/* Edit */}
-                  <DropdownItem
-                    key="edit"
-                    color="default"
-                    startContent={<Pencil size={20} />}
-                    onPress={() => {
-                      setMessage(msg.content);
-                      onOpen();
-                    }}
-                  >
-                    Edit
-                  </DropdownItem>
-
-                  {/* Unsend */}
-                  {msg._creationTime + 3600000 > Date.now() && (
-                    <>
-                      {!msg.unsentBy && (
-                        <DropdownItem
-                          key="unsend"
-                          color="default"
-                          startContent={<Undo2 size={20} />}
-                          onPress={() => {
-                            unsendMessage({
-                              _id: msg._id as Id<"messages">,
-                              unsentBy: currentUser?._id as Id<"users">,
-                              unsentAt: Date.now(),
-                            });
-
-                            if (index === 0) {
-                              updateChat({
-                                _id: activeChat?._id as Id<"chats">,
-                                lastMessage: "_message was unsent_",
-                                lastMessageSender:
-                                  currentUser?._id as Id<"users">,
-                                lastMessageTime: Date.now(),
-                              });
-                            }
-                          }}
-                        >
-                          Unsend
-                        </DropdownItem>
-                      )}
-                    </>
-                  )}
-                </>
-              ) : null}
-
-              {/* Delete */}
-              <DropdownItem
-                key="delete"
-                className="text-danger"
-                color="danger"
-                startContent={<Trash2 size={20} />}
-                onPress={() => {
-                  deleteMessage({
-                    _id: msg._id as Id<"messages">,
-                    deletedBy: msg.deletedBy
-                      ? [...msg.deletedBy, currentUser?._id as Id<"users">]
-                      : [currentUser?._id as Id<"users">],
-                    deletedAt: msg.deletedAt
-                      ? [...msg.deletedAt, Date.now()]
-                      : [Date.now()],
-                  });
-
-                  // TODO: update last message to previous message
-                  // if (index === 0) {
-                  //   updateChat({
-                  //     _id: activeChat?._id as Id<"chats">,
-                  //     lastMessage: "_message was unsent_",
-                  //     lastMessageSender: currentUser?._id as Id<"users">,
-                  //     lastMessageTime: Date.now(),
-                  //   });
-                  // }
-                }}
-              >
-                Delete for me
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-
-          {/* Edit message modal */}
-          <Modal
-            isDismissable={false}
-            isKeyboardDismissDisabled={false}
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
-          >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    <h3 className="text-2xl font-bold">Edit message</h3>
-                  </ModalHeader>
-                  <ModalBody>
-                    <form
-                      ref={formRef}
-                      className="flex items-end gap-2"
-                      onSubmit={(e) => {
-                        e.preventDefault();
-
-                        editMessage({
+                  {!msg.unsentBy && (
+                    <DropdownItem
+                      key="unsend"
+                      color="default"
+                      startContent={<Undo2 size={20} />}
+                      onPress={() => {
+                        unsendMessage({
                           _id: msg._id as Id<"messages">,
-                          content: message as string,
-                          editedBy: currentUser?._id as Id<"users">,
+                          unsentBy: currentUser?._id as Id<"users">,
+                          unsentAt: Date.now(),
                         });
 
-                        onClose();
+                        if (index === 0) {
+                          updateChat({
+                            _id: activeChat?._id as Id<"chats">,
+                            lastMessage: "_message was unsent_",
+                            lastMessageSender: currentUser?._id as Id<"users">,
+                            lastMessageTime: Date.now(),
+                          });
+                        }
                       }}
                     >
-                      <Textarea
-                        minRows={1}
-                        placeholder="Type a message"
-                        radius="full"
-                        value={message || ""}
-                        onChange={(e) => setMessage(e.target.value)}
-                        onKeyDown={(e) =>
-                          handleKeyDown(
-                            e as React.KeyboardEvent<HTMLTextAreaElement>,
-                            formRef,
-                          )
-                        }
-                      />
-
-                      <Button
-                        isIconOnly
-                        className="bg-black text-white dark:bg-white dark:text-black"
-                        radius="full"
-                        type="submit"
-                      >
-                        <SendHorizontal size={20} />
-                      </Button>
-                    </form>
-                  </ModalBody>
-                  <ModalFooter />
+                      Unsend
+                    </DropdownItem>
+                  )}
                 </>
               )}
-            </ModalContent>
-          </Modal>
-        </>
-      )}
+            </>
+          ) : null}
+
+          {/* Delete */}
+          <DropdownItem
+            key="delete"
+            className="text-danger"
+            color="danger"
+            startContent={<Trash2 size={20} />}
+            onPress={() => {
+              deleteMessage({
+                _id: msg._id as Id<"messages">,
+                deletedBy: msg.deletedBy
+                  ? [...msg.deletedBy, currentUser?._id as Id<"users">]
+                  : [currentUser?._id as Id<"users">],
+                deletedAt: msg.deletedAt
+                  ? [...msg.deletedAt, Date.now()]
+                  : [Date.now()],
+              });
+
+              // TODO: update last message to previous message
+              // if (index === 0) {
+              //   updateChat({
+              //     _id: activeChat?._id as Id<"chats">,
+              //     lastMessage: "_message was unsent_",
+              //     lastMessageSender: currentUser?._id as Id<"users">,
+              //     lastMessageTime: Date.now(),
+              //   });
+              // }
+            }}
+          >
+            Delete for me
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+
+      {/* Edit message modal */}
+      <Modal
+        isDismissable={false}
+        isKeyboardDismissDisabled={false}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                <h3 className="text-2xl font-bold">Edit message</h3>
+              </ModalHeader>
+              <ModalBody>
+                <form
+                  ref={formRef}
+                  className="flex items-end gap-2"
+                  onSubmit={(e) => {
+                    e.preventDefault();
+
+                    editMessage({
+                      _id: msg._id as Id<"messages">,
+                      content: message as string,
+                      editedBy: currentUser?._id as Id<"users">,
+                    });
+
+                    onClose();
+                  }}
+                >
+                  <Textarea
+                    minRows={1}
+                    placeholder="Type a message"
+                    radius="full"
+                    value={message || ""}
+                    onChange={(e) => setMessage(e.target.value)}
+                    onKeyDown={(e) =>
+                      handleKeyDown(
+                        e as React.KeyboardEvent<HTMLTextAreaElement>,
+                        formRef,
+                      )
+                    }
+                  />
+
+                  <Button
+                    isIconOnly
+                    className="bg-black text-white dark:bg-white dark:text-black"
+                    radius="full"
+                    type="submit"
+                  >
+                    <SendHorizontal size={20} />
+                  </Button>
+                </form>
+              </ModalBody>
+              <ModalFooter />
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 }
