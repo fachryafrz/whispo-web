@@ -10,7 +10,6 @@ import {
 } from "@heroui/dropdown";
 import { EllipsisVertical, Moon, Settings, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
-import { useEffect, useState } from "react";
 import { Skeleton } from "@heroui/skeleton";
 import { addToast } from "@heroui/toast";
 import { Tooltip } from "@heroui/tooltip";
@@ -22,26 +21,54 @@ import { siteConfig } from "@/config/site";
 export default function ChatListHeader() {
   const { resolvedTheme, setTheme } = useTheme();
 
-  const [mounted, setMounted] = useState(false);
-
   const onChange = () => {
     resolvedTheme === "light" ? setTheme("dark") : setTheme("light");
   };
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <header className={`grid grid-cols-3 items-center p-4`}>
-      {/* User */}
-      <ClerkLoading>
-        <Skeleton className="flex h-10 w-10 justify-self-start rounded-full" />
-      </ClerkLoading>
+      {/* CTA */}
+      <div className={`justify-self-start`}>
+        <Dropdown placement="bottom-start">
+          <DropdownTrigger>
+            <Button isIconOnly radius="full" variant="light">
+              <EllipsisVertical />
+            </Button>
+          </DropdownTrigger>
+          <DropdownMenu aria-label="Menu">
+            {/* Toggle theme */}
+            <DropdownItem
+              key="toggle-theme"
+              startContent={
+                resolvedTheme === "light" ? (
+                  <Moon size={20} />
+                ) : (
+                  <Sun size={20} />
+                )
+              }
+              onPress={onChange}
+            >
+              {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
+            </DropdownItem>
 
-      <ClerkLoaded>
-        <UserButton />
-      </ClerkLoaded>
+            {/* TODO: Settings */}
+            <DropdownItem
+              key="settings"
+              startContent={<Settings size={20} />}
+              onPress={() =>
+                addToast({
+                  title: "Settings",
+                  description:
+                    "Configure settings. This feature is coming soon.",
+                  color: "warning",
+                })
+              }
+            >
+              Settings
+            </DropdownItem>
+          </DropdownMenu>
+        </Dropdown>
+      </div>
 
       {/* App Name */}
       <Tooltip content={siteConfig.name} placement="bottom">
@@ -52,47 +79,16 @@ export default function ChatListHeader() {
         </div>
       </Tooltip>
 
-      {/* CTA */}
-      {mounted && (
-        <div className={`justify-self-end`}>
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Button isIconOnly radius="full" variant="light">
-                <EllipsisVertical />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Menu">
-              <DropdownItem
-                key="toggle-theme"
-                startContent={
-                  resolvedTheme === "light" ? (
-                    <Moon size={20} />
-                  ) : (
-                    <Sun size={20} />
-                  )
-                }
-                onPress={onChange}
-              >
-                {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
-              </DropdownItem>
-              <DropdownItem
-                key="settings"
-                startContent={<Settings size={20} />}
-                onPress={() =>
-                  addToast({
-                    title: "Settings",
-                    description:
-                      "Configure settings. This feature is coming soon.",
-                    color: "warning",
-                  })
-                }
-              >
-                Settings
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
+      {/* User */}
+      <ClerkLoading>
+        <Skeleton className="flex h-10 w-10 justify-self-end rounded-full" />
+      </ClerkLoading>
+
+      <ClerkLoaded>
+        <div className="flex justify-self-end">
+          <UserButton />
         </div>
-      )}
+      </ClerkLoaded>
     </header>
   );
 }

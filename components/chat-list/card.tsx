@@ -2,6 +2,7 @@ import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Image } from "@heroui/image";
 import { Pin } from "lucide-react";
+import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 
 type ChatCardProps = {
@@ -12,7 +13,7 @@ type ChatCardProps = {
   timeSent?: string;
   unreadCount?: number;
   pinned?: boolean;
-  onPress?: () => void;
+  onPress: () => void;
 };
 
 export default function ChatCard({
@@ -25,11 +26,16 @@ export default function ChatCard({
   pinned, // TODO: Example: true
   onPress,
 }: ChatCardProps) {
+  const router = useRouter();
+
   return (
     <Button
       className="h-auto w-full rounded-none border-b border-default-200 p-4 text-start last:border-b-0 dark:border-neutral-800"
       variant="light"
-      onPress={onPress}
+      onPress={() => {
+        onPress();
+        router.push("/chat");
+      }}
     >
       <div className="grid w-full grid-cols-[40px_1fr_auto] items-center gap-2">
         {/* Avatar/Image */}

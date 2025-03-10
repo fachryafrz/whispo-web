@@ -1,20 +1,25 @@
 "use client";
 
 import { useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 import ChatHeader from "./header";
 import ChatMessages from "./messages";
 import ChatInput from "./input";
+import SelectAChat from "./select-a-chat";
 
 import { useChat } from "@/zustand/chat";
 
 export default function Chat() {
+  const router = useRouter();
+
   const { activeChat, clearActiveChat } = useChat();
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") {
         clearActiveChat();
+        router.back();
       }
     };
 
@@ -41,11 +46,7 @@ export default function Chat() {
           <ChatInput />
         </section>
       ) : (
-        <section
-          className={`hidden flex-1 place-content-center bg-neutral-100 text-default-500 dark:bg-neutral-950 md:grid`}
-        >
-          <h2 className="text-lg font-bold">Select a chat</h2>
-        </section>
+        <SelectAChat />
       )}
     </>
   );

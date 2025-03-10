@@ -7,6 +7,7 @@ import { Providers } from "./providers";
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
+import ChatList from "@/components/chat-list";
 
 export const metadata: Metadata = {
   title: {
@@ -72,7 +73,13 @@ export default function RootLayout({
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <ConvexClientProvider>
-            <main>{children}</main>
+            <main>
+              <div className={`relative flex h-screen`}>
+                <ChatList />
+
+                {children}
+              </div>
+            </main>
           </ConvexClientProvider>
         </Providers>
       </body>

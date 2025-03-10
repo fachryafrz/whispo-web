@@ -1,12 +1,5 @@
-import Chat from "@/components/chat";
-import ChatList from "@/components/chat-list";
+import SelectAChat from "@/components/chat/select-a-chat";
 
 export default function Home() {
-  return (
-    <div className={`relative flex h-screen`}>
-      <ChatList />
-
-      <Chat />
-    </div>
-  );
+  return <SelectAChat />;
 }

@@ -17,13 +17,15 @@ import {
   ModalFooter,
   useDisclosure,
 } from "@heroui/modal";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
 
 export default function ChatHeader() {
+  const router = useRouter();
+
   const { activeChat, clearActiveChat } = useChat();
 
   const currentUser = useQuery(api.users.getCurrentUser);
@@ -43,7 +45,10 @@ export default function ChatHeader() {
           className="md:hidden"
           radius="full"
           variant="light"
-          onPress={() => clearActiveChat()}
+          onPress={() => {
+            clearActiveChat();
+            router.back();
+          }}
         >
           <ArrowLeft />
         </Button>
@@ -108,8 +113,6 @@ function Options() {
   const { activeChat, clearActiveChat } = useChat();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const [mounted, setMounted] = useState(false);
-
   const deleteChat = useMutation(api.chats.deleteChat);
 
   const handleDelete = () => {
@@ -117,70 +120,62 @@ function Options() {
     clearActiveChat();
   };
 
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   return (
     <>
-      {mounted && (
-        <>
-          <Dropdown placement="bottom-end">
-            <DropdownTrigger>
-              <Button isIconOnly radius="full" variant="light">
-                <EllipsisVertical />
-              </Button>
-            </DropdownTrigger>
-            <DropdownMenu aria-label="Menu">
-              <DropdownItem
-                key="delete"
-                className="text-danger"
-                color="danger"
-                startContent={<Trash2 size={20} />}
-                onPress={onOpen}
-              >
-                Delete
-              </DropdownItem>
-            </DropdownMenu>
-          </Dropdown>
-
-          <Modal
-            backdrop="blur"
-            isDismissable={false}
-            isKeyboardDismissDisabled={false}
-            isOpen={isOpen}
-            onOpenChange={onOpenChange}
+      <Dropdown placement="bottom-end">
+        <DropdownTrigger>
+          <Button isIconOnly radius="full" variant="light">
+            <EllipsisVertical />
+          </Button>
+        </DropdownTrigger>
+        <DropdownMenu aria-label="Menu">
+          <DropdownItem
+            key="delete"
+            className="text-danger"
+            color="danger"
+            startContent={<Trash2 size={20} />}
+            onPress={onOpen}
           >
-            <ModalContent>
-              {(onClose) => (
-                <>
-                  <ModalHeader className="flex flex-col gap-1">
-                    <h3 className="text-2xl font-bold">Delete conversation</h3>
-                  </ModalHeader>
-                  <ModalBody>
-                    <p>
-                      Are you sure you want to delete this conversation? This
-                      action is irreversible.
-                    </p>
-                    <p>
-                      This will permanently delete the conversation for you and
-                      the other participant.
-                    </p>
-                  </ModalBody>
-                  <ModalFooter>
-                    <Button color="default" variant="light" onPress={onClose}>
-                      Close
-                    </Button>
-                    <Button color="danger" onPress={handleDelete}>
-                      Yes, delete
-                    </Button>
-                  </ModalFooter>
-                </>
-              )}
-            </ModalContent>
-          </Modal>
-        </>
-      )}
+            Delete
+          </DropdownItem>
+        </DropdownMenu>
+      </Dropdown>
+
+      <Modal
+        backdrop="blur"
+        isDismissable={false}
+        isKeyboardDismissDisabled={false}
+        isOpen={isOpen}
+        onOpenChange={onOpenChange}
+      >
+        <ModalContent>
+          {(onClose) => (
+            <>
+              <ModalHeader className="flex flex-col gap-1">
+                <h3 className="text-2xl font-bold">Delete conversation</h3>
+              </ModalHeader>
+              <ModalBody>
+                <p>
+                  Are you sure you want to delete this conversation? This action
+                  is irreversible.
+                </p>
+                <p>
+                  This will permanently delete the conversation for you and the
+                  other participant.
+                </p>
+              </ModalBody>
+              <ModalFooter>
+                <Button color="default" variant="light" onPress={onClose}>
+                  Close
+                </Button>
+                <Button color="danger" onPress={handleDelete}>
+                  Yes, delete
+                </Button>
+              </ModalFooter>
+            </>
+          )}
+        </ModalContent>
+      </Modal>
     </>
   );
 }

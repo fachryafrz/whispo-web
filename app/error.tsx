@@ -19,7 +19,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div className={`flex h-dvh flex-col items-center justify-center gap-4`}>
+    <div className={`flex flex-1 h-dvh flex-col items-center justify-center gap-4`}>
       <Logo width={80} />
       <h2 className={`text-2xl font-bold`}>Something went wrong!</h2>
       <Button
