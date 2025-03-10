@@ -28,17 +28,16 @@ export default function ChatInput() {
   const sendMessage = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!text) return;
+    if (!text!.trim()) return;
 
     storeMessage({
       chat: activeChat?._id as Id<"chats">,
       sender: currentUser?._id as Id<"users">,
-      content: text,
+      content: text as string,
       replyTo: (replyMessageId as Id<"messages">) || undefined,
     }).then(() => {
       setText("");
       clearReplyTo();
-      textareaRef.current?.focus();
     });
 
     updateChat({
@@ -46,6 +45,11 @@ export default function ChatInput() {
       lastMessage: text as string,
       lastMessageSender: currentUser?._id as Id<"users">,
       lastMessageTime: Date.now(),
+    });
+
+    window.scrollTo({
+      top: document.body.scrollHeight,
+      behavior: "smooth",
     });
   };
 
@@ -69,6 +73,7 @@ export default function ChatInput() {
         <Button
           isIconOnly
           radius="full"
+          type="button"
           variant="light"
           onPress={() =>
             addToast({
@@ -100,6 +105,7 @@ export default function ChatInput() {
 
         {/* Send */}
         <Button
+          disableAnimation
           isIconOnly
           className="bg-black text-white dark:bg-white dark:text-black"
           radius="full"
