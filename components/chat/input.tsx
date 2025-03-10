@@ -4,6 +4,7 @@ import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "convex/react";
 import { Paperclip, SendHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import ReactMarkdown from "react-markdown";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
@@ -130,7 +131,24 @@ function ReplyTo() {
             </span>
 
             {/* Content */}
-            <span className="block">{getMessage?.content}</span>
+            <div
+              className={`prose max-h-20 max-w-none overflow-hidden text-xs text-black marker:text-black dark:text-white dark:marker:text-white`}
+            >
+              <ReactMarkdown
+                components={{
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote {...props} className={`dark:text-white`}>
+                      {props.children}
+                    </blockquote>
+                  ),
+                }}
+              >
+                {getMessage.unsentBy
+                  ? `_message was unsent_`
+                  : getMessage?.content}
+              </ReactMarkdown>
+            </div>
           </div>
 
           {/* Clear */}

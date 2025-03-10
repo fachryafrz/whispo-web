@@ -2,6 +2,7 @@ import { useMutation, useQuery } from "convex/react";
 import dayjs from "dayjs";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import { useEffect, useRef, useState } from "react";
 import {
   Dropdown,
@@ -15,6 +16,7 @@ import {
   Pencil,
   Reply,
   SendHorizontal,
+  Trash2,
   Undo2,
 } from "lucide-react";
 import {
@@ -47,28 +49,36 @@ export default function ChatMessages() {
     <div className="relative flex-1 overflow-y-hidden before:absolute before:inset-0 before:bg-[url(/background/doodle.avif)] before:bg-[size:350px] before:bg-repeat before:opacity-10 before:dark:invert">
       {/* Messages */}
       <div className="relative flex h-full flex-1 flex-col-reverse items-center gap-1 overflow-y-auto p-4">
-        {messages?.map((msg, index) => {
-          const prevMsg = messages[index + 1];
-          const isDifferentSender = prevMsg?.sender !== msg.sender;
+        {messages
+          ?.filter(
+            (msg) => !msg.deletedBy?.includes(currentUser?._id as Id<"users">),
+          )
+          .map((msg, index) => {
+            const prevMsg = messages[index + 1];
+            const isDifferentSender = prevMsg?.sender !== msg.sender;
 
-          return (
-            <div
-              key={msg._id}
-              className={`w-full ${isDifferentSender ? "pt-4" : "pt-0"}`}
-            >
-              <Message currentUser={currentUser as Doc<"users">} msg={msg} />
+            return (
+              <div
+                key={msg._id}
+                className={`w-full ${isDifferentSender ? "pt-4" : "pt-0"}`}
+              >
+                <Message
+                  currentUser={currentUser as Doc<"users">}
+                  index={index}
+                  msg={msg}
+                />
 
-              {/* Edited */}
-              {msg.editedBy && (
-                <span
-                  className={`flex text-xs ${msg.sender === currentUser?._id ? "justify-end" : "justify-start"}`}
-                >
-                  Edited
-                </span>
-              )}
-            </div>
-          );
-        })}
+                {/* Edited */}
+                {msg.editedBy && (
+                  <span
+                    className={`flex text-xs ${msg.sender === currentUser?._id ? "justify-end" : "justify-start"}`}
+                  >
+                    Edited
+                  </span>
+                )}
+              </div>
+            );
+          })}
 
         {/* TODO: Paginate messages */}
         <Spinner color="white" />
@@ -79,17 +89,17 @@ export default function ChatMessages() {
 
 function Message({
   msg,
-  className,
   currentUser,
+  index,
 }: {
   msg: Doc<"messages">;
-  className?: string;
   currentUser: Doc<"users">;
+  index: number;
 }) {
   return (
     <div
       key={msg._id}
-      className={`group flex gap-1 ${className} ${
+      className={`group flex gap-1 ${
         msg.sender === currentUser?._id ? "justify-end" : "justify-start"
       }`}
     >
@@ -118,8 +128,8 @@ function Message({
             <div
               className={`prose text-sm ${
                 msg.sender === currentUser?._id
-                  ? "text-black marker:text-black prose-a:text-black dark:text-white dark:marker:text-white dark:prose-a:text-white dark:prose-blockquote:text-white prose-code:dark:text-white"
-                  : "text-white marker:text-white prose-a:text-white dark:text-black dark:marker:text-black dark:prose-a:text-black dark:prose-blockquote:text-black prose-code:dark:text-black"
+                  ? "text-black marker:text-black dark:text-white dark:marker:text-white"
+                  : "text-white marker:text-white dark:text-black dark:marker:text-black"
               }`}
               style={{
                 wordBreak: "break-word",
@@ -129,12 +139,40 @@ function Message({
                 components={{
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   a: ({ node, ...props }) => (
-                    <a {...props} rel="noopener noreferrer" target="_blank">
+                    <a
+                      {...props}
+                      className={`${
+                        msg.sender === currentUser?._id
+                          ? "text-black dark:text-white"
+                          : "text-white dark:text-black"
+                      }`}
+                      rel="noopener noreferrer"
+                      target="_blank"
+                    >
                       {props.children}
                     </a>
                   ),
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  blockquote: ({ node, ...props }) => (
+                    <blockquote
+                      {...props}
+                      className={`${
+                        msg.sender === currentUser?._id
+                          ? "text-black dark:text-white"
+                          : "text-white dark:text-black"
+                      }`}
+                    >
+                      {props.children}
+                    </blockquote>
+                  ),
+                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                  code: ({ node, ...props }) => (
+                    <code {...props} className={`text-white`}>
+                      {props.children}
+                    </code>
+                  ),
                 }}
-                remarkPlugins={[remarkGfm]}
+                remarkPlugins={[remarkGfm, remarkBreaks]}
               >
                 {msg.unsentBy ? `_message was unsent_` : msg.content}
               </ReactMarkdown>
@@ -163,7 +201,7 @@ function Message({
           msg.sender === currentUser?._id ? "order-1" : "order-2"
         }`}
       >
-        <MessageOptions msg={msg} />
+        <MessageOptions index={index} msg={msg} />
       </div>
     </div>
   );
@@ -185,13 +223,24 @@ function ReplyTo({ msg }: { msg: Doc<"messages"> }) {
           </div>
 
           {/* Content */}
-          <p
-            style={{
-              wordBreak: "break-word",
-            }}
+          <div
+            className={`prose max-h-20 overflow-hidden text-xs text-black marker:text-black dark:text-white dark:marker:text-white`}
           >
-            {getMessage?.content}
-          </p>
+            <ReactMarkdown
+              components={{
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+                blockquote: ({ node, ...props }) => (
+                  <blockquote {...props} className={`dark:text-white`}>
+                    {props.children}
+                  </blockquote>
+                ),
+              }}
+            >
+              {getMessage.unsentBy
+                ? `_message was unsent_`
+                : getMessage?.content}
+            </ReactMarkdown>
+          </div>
         </div>
       ) : (
         <div className="h-[52px] rounded-md bg-white p-2 text-xs dark:bg-black" />
@@ -200,17 +249,26 @@ function ReplyTo({ msg }: { msg: Doc<"messages"> }) {
   );
 }
 
-function MessageOptions({ msg }: { msg: Doc<"messages"> }) {
+function MessageOptions({
+  msg,
+  index,
+}: {
+  msg: Doc<"messages">;
+  index: number;
+}) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
+  const { activeChat } = useChat();
   const { message, setMessage } = useEditMessage();
-  const { replyMessageId, setReplyMessageId, clearReplyTo } = useReplyMessage();
+  const { setReplyMessageId } = useReplyMessage();
 
   const formRef = useRef<HTMLFormElement>(null);
 
   const currentUser = useQuery(api.users.getCurrentUser);
 
+  const updateChat = useMutation(api.chats.updateChatById);
   const editMessage = useMutation(api.messages.editMessage);
   const unsendMessage = useMutation(api.messages.unsendMessage);
+  const deleteMessage = useMutation(api.messages.deleteMessage);
 
   const [mounted, setMounted] = useState(false);
   const [windowWidth, setWindowWidth] = useState(0);
@@ -262,6 +320,7 @@ function MessageOptions({ msg }: { msg: Doc<"messages"> }) {
               >
                 Reply
               </DropdownItem>
+
               {msg.sender === currentUser?._id ? (
                 <>
                   {/* Edit */}
@@ -278,22 +337,69 @@ function MessageOptions({ msg }: { msg: Doc<"messages"> }) {
                   </DropdownItem>
 
                   {/* Unsend */}
-                  <DropdownItem
-                    key="unsend"
-                    className="text-danger"
-                    color="danger"
-                    startContent={<Undo2 size={20} />}
-                    onPress={() => {
-                      unsendMessage({
-                        _id: msg._id as Id<"messages">,
-                        unsentBy: currentUser?._id as Id<"users">,
-                      });
-                    }}
-                  >
-                    Unsend
-                  </DropdownItem>
+                  {msg._creationTime + 3600000 > Date.now() && (
+                    <>
+                      {!msg.unsentBy && (
+                        <DropdownItem
+                          key="unsend"
+                          color="default"
+                          startContent={<Undo2 size={20} />}
+                          onPress={() => {
+                            unsendMessage({
+                              _id: msg._id as Id<"messages">,
+                              unsentBy: currentUser?._id as Id<"users">,
+                              unsentAt: Date.now(),
+                            });
+
+                            if (index === 0) {
+                              updateChat({
+                                _id: activeChat?._id as Id<"chats">,
+                                lastMessage: "_message was unsent_",
+                                lastMessageSender:
+                                  currentUser?._id as Id<"users">,
+                                lastMessageTime: Date.now(),
+                              });
+                            }
+                          }}
+                        >
+                          Unsend
+                        </DropdownItem>
+                      )}
+                    </>
+                  )}
                 </>
               ) : null}
+
+              {/* Delete */}
+              <DropdownItem
+                key="delete"
+                className="text-danger"
+                color="danger"
+                startContent={<Trash2 size={20} />}
+                onPress={() => {
+                  deleteMessage({
+                    _id: msg._id as Id<"messages">,
+                    deletedBy: msg.deletedBy
+                      ? [...msg.deletedBy, currentUser?._id as Id<"users">]
+                      : [currentUser?._id as Id<"users">],
+                    deletedAt: msg.deletedAt
+                      ? [...msg.deletedAt, Date.now()]
+                      : [Date.now()],
+                  });
+
+                  // TODO: update last message to previous message
+                  // if (index === 0) {
+                  //   updateChat({
+                  //     _id: activeChat?._id as Id<"chats">,
+                  //     lastMessage: "_message was unsent_",
+                  //     lastMessageSender: currentUser?._id as Id<"users">,
+                  //     lastMessageTime: Date.now(),
+                  //   });
+                  // }
+                }}
+              >
+                Delete for me
+              </DropdownItem>
             </DropdownMenu>
           </Dropdown>
 
