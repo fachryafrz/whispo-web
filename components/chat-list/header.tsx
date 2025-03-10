@@ -13,6 +13,7 @@ import { useTheme } from "next-themes";
 import { Skeleton } from "@heroui/skeleton";
 import { addToast } from "@heroui/toast";
 import { Tooltip } from "@heroui/tooltip";
+import Link from "next/link";
 
 import Logo from "../logo";
 
@@ -72,11 +73,11 @@ export default function ChatListHeader() {
 
       {/* App Name */}
       <Tooltip content={siteConfig.name} placement="bottom">
-        <div className="justify-self-center">
+        <Link className="flex justify-self-center" href={`/`} prefetch={false}>
           <Logo height={30} />
 
           <h1 className={`sr-only`}>{siteConfig.name}</h1>
-        </div>
+        </Link>
       </Tooltip>
 
       {/* User */}
