@@ -1,53 +1,58 @@
-# Next.js & HeroUI Template
+[![Whispo](https://fachryafrz.vercel.app/projects/whispo/cover.png)](https://whispochat.vercel.app)
 
-This is a template for creating applications using Next.js 14 (app directory) and HeroUI (v2).
+# Whispo – Real-time chat app
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/heroui/next-app-template)
+Whispo is a fast, secure, and intuitive real-time chat application designed to enhance communication. With seamless authentication, real-time messaging, and an elegant UI, Whispo ensures a smooth chat experience for users.
 
-## Technologies Used
+## 🔍 How It Works
 
-- [Next.js 14](https://nextjs.org/docs/getting-started)
-- [HeroUI v2](https://heroui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [Framer Motion](https://www.framer.com/motion/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+- **Secure Authentication** – Log in to access a personalized chat experience.
+- **Real-time Messaging** – Instantly send and receive messages with low latency.
+- **User-friendly Interface** – Enjoy a clean and modern chat UI for effortless communication.
+- **Organized Chats** – Easily manage your chat history and active chats.
+- **Fast & Reliable** – Powered by Convex for real-time updates and optimized performance.
 
-## How to Use
+## ✨ Key Features
 
-### Use the template with create-next-app
+- **Instant Messaging** – Chat in real-time with a smooth experience.
+- **Secure Login** – Authenticate easily with Clerk for a safe and private chat.
+- **Optimized UI** – Beautiful and responsive interface built with HeroUI and Tailwind CSS.
+- **Real-time Updates** – Messages sync instantly using Convex's real-time database.
+- **Scalable & Modern** – Built with Next.js 15 and TypeScript for performance and maintainability.
 
-To create a new project based on this template using `create-next-app`, run the following command:
+## 🛠️ Tech Stack
 
-```bash
-npx create-next-app -e https://github.com/heroui-inc/next-app-template
-```
+- **Next.js 15** – React-based framework
+- **React** – JavaScript framework
+- **HeroUI** – Tailwind CSS component library
+- **Tailwind CSS** – Styling and UI design
+- **Clerk** – Secure authentication
+- **Convex** – Real-time database
+- **Typescript** – Static type checking
 
-### Install dependencies
+## ✨ Features
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+- 🔑 Authentication with Clerk
 
-```bash
-npm install
-```
+  - 🔐 Sign In/Sign Up
+  - 🧑‍💼 User Profiles
+  - 🖼️ Change Profile Picture
+  - ✏️ Change Name
+  - 🔤 Change Username
+  - 🌍 Login with Google
 
-### Run the development server
-
-```bash
-npm run dev
-```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
-public-hoist-pattern[]=*@heroui/*
-```
-
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
-
-## License
-
-Licensed under the [MIT license](https://github.com/heroui-inc/next-app-template/blob/main/LICENSE).
+- ⚡ Real-time database with Convex
+  - 🔎 Search for users by username
+  - 💬 Send messages
+  - ↩️ Reply to messages
+  - 📝 Edit messages
+  - ❌ Unsend messages
+  - 🗑️ Delete messages
+  - 📜 View chat history
+  - 📑 Auto load messages
+  - 🗑️ Delete chats
+  - 🖼️ Message with media (coming soon)
+  - 📂 Archive chats (coming soon)
+  - 📌 Pin chats (coming soon)
+  - 👥 Group chats (coming soon)
+  - 🔔 Unread count (coming soon)
