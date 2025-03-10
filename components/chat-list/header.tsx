@@ -14,6 +14,7 @@ import { Skeleton } from "@heroui/skeleton";
 import { addToast } from "@heroui/toast";
 import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
+import { useEffect, useState } from "react";
 
 import Logo from "../logo";
 
@@ -22,53 +23,61 @@ import { siteConfig } from "@/config/site";
 export default function ChatListHeader() {
   const { resolvedTheme, setTheme } = useTheme();
 
+  const [mounted, setMounted] = useState<boolean>(false);
+
   const onChange = () => {
     resolvedTheme === "light" ? setTheme("dark") : setTheme("light");
   };
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <header className={`grid grid-cols-3 items-center p-4`}>
       {/* CTA */}
       <div className={`justify-self-start`}>
-        <Dropdown placement="bottom-start">
-          <DropdownTrigger>
-            <Button isIconOnly radius="full" variant="light">
-              <EllipsisVertical />
-            </Button>
-          </DropdownTrigger>
-          <DropdownMenu aria-label="Menu">
-            {/* Toggle theme */}
-            <DropdownItem
-              key="toggle-theme"
-              startContent={
-                resolvedTheme === "light" ? (
-                  <Moon size={20} />
-                ) : (
-                  <Sun size={20} />
-                )
-              }
-              onPress={onChange}
-            >
-              {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
-            </DropdownItem>
+        {mounted && (
+          <Dropdown placement="bottom-start">
+            <DropdownTrigger>
+              <Button isIconOnly radius="full" variant="light">
+                <EllipsisVertical />
+              </Button>
+            </DropdownTrigger>
+            <DropdownMenu aria-label="Menu">
+              {/* Toggle theme */}
+              <DropdownItem
+                key="toggle-theme"
+                startContent={
+                  resolvedTheme === "light" ? (
+                    <Moon size={20} />
+                  ) : (
+                    <Sun size={20} />
+                  )
+                }
+                onPress={onChange}
+              >
+                {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
+              </DropdownItem>
 
-            {/* TODO: Settings */}
-            <DropdownItem
-              key="settings"
-              startContent={<Settings size={20} />}
-              onPress={() =>
-                addToast({
-                  title: "Settings",
-                  description:
-                    "Configure settings. This feature is coming soon.",
-                  color: "warning",
-                })
-              }
-            >
-              Settings
-            </DropdownItem>
-          </DropdownMenu>
-        </Dropdown>
+              {/* TODO: Settings */}
+              <DropdownItem
+                key="settings"
+                startContent={<Settings size={20} />}
+                onPress={() =>
+                  addToast({
+                    title: "Settings",
+                    description:
+                      "Configure settings. This feature is coming soon.",
+                    color: "warning",
+                  })
+                }
+              >
+                Settings
+              </DropdownItem>
+            </DropdownMenu>
+          </Dropdown>
+        )}
       </div>
 
       {/* App Name */}

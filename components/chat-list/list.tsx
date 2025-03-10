@@ -44,7 +44,7 @@ export default function List() {
       )}
 
       {/* List of chats */}
-      {chats?.length! > 0 && chats?.every((chat) => chat.lastMessage) && (
+      {chats?.length! > 0 && chats?.some((chat) => chat.lastMessage) && (
         <ul className={`h-full overflow-y-auto`}>
           {chats
             ?.filter((chat) => chat.lastMessage)
