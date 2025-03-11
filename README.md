@@ -1,4 +1,4 @@
-[![Whispo](https://fachryafrz.vercel.app/projects/whispo/cover.png)](https://whispochat.vercel.app)
+[![Whispo](https://fachryafrz.com/projects/whispo/cover.png)](https://whispo.fachryafrz.com)
 
 # Whispo – Real-time chat app
 
