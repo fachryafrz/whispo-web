@@ -52,7 +52,7 @@ Whispo is a fast, secure, and intuitive real-time chat application designed to e
   - 📑 Auto load messages
   - 🗑️ Delete chats
   - 🖼️ Message with media (coming soon)
-  - 📂 Archive chats (coming soon)
-  - 📌 Pin chats (coming soon)
+  - 📂 Archive chats
+  - 📌 Pin chats
   - 👥 Group chats (coming soon)
   - 🔔 Unread count (coming soon)
