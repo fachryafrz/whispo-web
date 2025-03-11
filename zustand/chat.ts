@@ -1,10 +1,10 @@
 import { create } from "zustand";
 
-import { Chat } from "@/types";
+import { Doc } from "@/convex/_generated/dataModel";
 
 type ChatState = {
-  activeChat: Chat | null;
-  setActiveChat: (chat: Chat) => void;
+  activeChat: Doc<"chats"> | null;
+  setActiveChat: (chat: Doc<"chats">) => void;
   clearActiveChat: () => void;
 };
 

@@ -26,6 +26,7 @@ export default defineSchema({
     pinned: v.optional(v.boolean()),
     unreadCount: v.optional(v.number()),
     seenBy: v.optional(v.array(v.id("users"))),
+    archived: v.optional(v.boolean()),
   })
     .index("by_type", ["type"])
     .index("by_participants_and_type", ["participants", "type"]),

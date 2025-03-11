@@ -1,5 +1,6 @@
 "use client";
 
+import ArchivedChats from "./archived-chats";
 import ChatListHeader from "./header";
 import List from "./list";
 import SearchUser from "./search-user";
@@ -17,6 +18,8 @@ export default function ChatList() {
         <List />
 
         <SearchUser />
+        
+        <ArchivedChats />
       </div>
     </section>
   );

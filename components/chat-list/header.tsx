@@ -3,8 +3,7 @@ import { useTheme } from "next-themes";
 import { Skeleton } from "@heroui/skeleton";
 import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
-import { EllipsisVertical, Moon, Settings, Sun } from "lucide-react";
-import { addToast } from "@heroui/toast";
+import { Archive, EllipsisVertical, Moon, Sun } from "lucide-react";
 
 import Logo from "../logo";
 import {
@@ -15,9 +14,11 @@ import {
 } from "../ui/dropdown-menu";
 
 import { siteConfig } from "@/config/site";
+import { useArchivedChats } from "@/zustand/archived-chats";
 
 export default function ChatListHeader() {
   const { resolvedTheme, setTheme } = useTheme();
+  const { open, setOpen } = useArchivedChats();
 
   const onChange = () => {
     resolvedTheme === "light" ? setTheme("dark") : setTheme("light");
@@ -45,16 +46,11 @@ export default function ChatListHeader() {
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => {
-                addToast({
-                  title: "Settings",
-                  description:
-                    "Configure settings. This feature is coming soon.",
-                  color: "warning",
-                });
+                setOpen(true);
               }}
             >
-              <Settings size={20} />
-              <div>Settings</div>
+              <Archive size={20} />
+              <div>Archived Chats</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>

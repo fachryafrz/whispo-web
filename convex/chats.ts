@@ -3,7 +3,6 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 import { arraysEqual } from "@/helper/arrays-equal";
-import { Chat } from "@/types";
 
 export const get = query({
   args: {},
@@ -43,6 +42,21 @@ export const getChatsByCurrentUser = query({
   },
 });
 
+export const getArchivedChatsByCurrentUser = query({
+  args: {
+    currentUser: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const allChats = await ctx.db.query("chats").collect();
+    const userChats = allChats.filter((chat) =>
+      chat.participants.some((participant) => participant === args.currentUser),
+    );
+    const archivedChats = userChats.filter((chat) => chat.archived);
+
+    return archivedChats;
+  },
+});
+
 export const getChatById = query({
   args: { _id: v.id("chats") },
   handler: async (ctx, args) => {
@@ -65,7 +79,11 @@ export const getChatById = query({
 });
 
 export const store = mutation({
-  handler: async (ctx, args: Chat) => {
+  args: {
+    type: v.string(),
+    participants: v.array(v.id("users")),
+  },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
@@ -116,6 +134,26 @@ export const updateChatById = mutation({
   },
   handler: async (ctx, args) => {
     return await ctx.db.patch(args._id, args);
+  },
+});
+
+export const pinChat = mutation({
+  args: {
+    _id: v.id("chats"),
+    pinned: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args._id, { pinned: args.pinned });
+  },
+});
+
+export const archiveChat = mutation({
+  args: {
+    _id: v.id("chats"),
+    archived: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args._id, { archived: args.archived });
   },
 });
 
