@@ -1,21 +1,18 @@
-"use client";
-
 import { ClerkLoaded, ClerkLoading, UserButton } from "@clerk/nextjs";
-import { Button } from "@heroui/button";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
-import { EllipsisVertical, Moon, Settings, Sun } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Skeleton } from "@heroui/skeleton";
-import { addToast } from "@heroui/toast";
 import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
+import { EllipsisVertical, Moon, Settings, Sun } from "lucide-react";
+import { addToast } from "@heroui/toast";
 
 import Logo from "../logo";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 import { siteConfig } from "@/config/site";
 
@@ -30,14 +27,47 @@ export default function ChatListHeader() {
     <header className={`grid grid-cols-3 items-center p-4`}>
       {/* CTA */}
       <div className={`justify-self-start`}>
-        <Dropdown placement="bottom-start">
+        <DropdownMenu>
+          <DropdownMenuTrigger className="flex h-10 w-10 items-center justify-center rounded-full outline-none transition-all hover:bg-default/40">
+            <EllipsisVertical />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            <DropdownMenuItem className="cursor-pointer" onClick={onChange}>
+              {resolvedTheme === "light" ? (
+                <Moon size={20} />
+              ) : (
+                <Sun size={20} />
+              )}
+              <div>
+                {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
+              </div>
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              className="cursor-pointer"
+              onClick={() => {
+                addToast({
+                  title: "Settings",
+                  description:
+                    "Configure settings. This feature is coming soon.",
+                  color: "warning",
+                });
+              }}
+            >
+              <Settings size={20} />
+              <div>Settings</div>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+
+        {/* NOTE: Keep this until this Issue is fixed: https://github.com/heroui-inc/heroui/issues/4786 */}
+        {/* <Dropdown placement="bottom-start">
           <DropdownTrigger>
             <Button isIconOnly radius="full" variant="light">
               <EllipsisVertical />
             </Button>
           </DropdownTrigger>
           <DropdownMenu aria-label="Menu">
-            {/* Toggle theme */}
+            // Toggle theme
             <DropdownItem
               key="toggle-theme"
               startContent={
@@ -52,7 +82,7 @@ export default function ChatListHeader() {
               {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
             </DropdownItem>
 
-            {/* TODO: Settings */}
+            // TODO: Settings
             <DropdownItem
               key="settings"
               startContent={<Settings size={20} />}
@@ -68,7 +98,8 @@ export default function ChatListHeader() {
               Settings
             </DropdownItem>
           </DropdownMenu>
-        </Dropdown>
+        </Dropdown> */}
+        {/* NOTE: Keep this until this Issue is fixed: https://github.com/heroui-inc/heroui/issues/4786 */}
       </div>
 
       {/* App Name */}

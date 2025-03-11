@@ -4,12 +4,6 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import { useEffect, useRef, useState } from "react";
-import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
 import { Button } from "@heroui/button";
 import {
   ArrowDown,
@@ -31,6 +25,13 @@ import {
 import { Textarea } from "@heroui/input";
 import { Spinner } from "@heroui/spinner";
 import { useInView } from "react-intersection-observer";
+
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
@@ -332,7 +333,103 @@ function MessageOptions({
 
   return (
     <>
-      <Dropdown
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex h-10 w-10 items-center justify-center rounded-full outline-none transition-all hover:bg-default/40">
+          <EllipsisVertical />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align={`center`}
+        >
+          {/* Reply */}
+          <DropdownMenuItem
+            className="cursor-pointer"
+            onClick={() => {
+              setReplyMessageId(msg._id);
+            }}
+          >
+            <Reply size={20} />
+            <div>Reply</div>
+          </DropdownMenuItem>
+
+          {msg.sender === currentUser?._id ? (
+            <>
+              {/* Edit */}
+              <DropdownMenuItem
+                className="cursor-pointer"
+                onClick={() => {
+                  setMessage(msg.content);
+                  onOpen();
+                }}
+              >
+                <Pencil size={20} />
+                <div>Reply</div>
+              </DropdownMenuItem>
+
+              {/* Unsend */}
+              {msg._creationTime + 3600000 > Date.now() && (
+                <>
+                  {!msg.unsentBy && (
+                    <DropdownMenuItem
+                      className="cursor-pointer"
+                      onClick={() => {
+                        unsendMessage({
+                          _id: msg._id as Id<"messages">,
+                          unsentBy: currentUser?._id as Id<"users">,
+                          unsentAt: Date.now(),
+                        });
+
+                        if (index === 0) {
+                          updateChat({
+                            _id: activeChat?._id as Id<"chats">,
+                            lastMessage: "_message was unsent_",
+                            lastMessageSender: currentUser?._id as Id<"users">,
+                            lastMessageTime: Date.now(),
+                          });
+                        }
+                      }}
+                    >
+                      <Undo2 size={20} />
+                      <div>Unsend</div>
+                    </DropdownMenuItem>
+                  )}
+                </>
+              )}
+            </>
+          ) : null}
+
+          {/* Delete */}
+          <DropdownMenuItem
+            className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
+            onClick={() => {
+              deleteMessage({
+                _id: msg._id as Id<"messages">,
+                deletedBy: msg.deletedBy
+                  ? [...msg.deletedBy, currentUser?._id as Id<"users">]
+                  : [currentUser?._id as Id<"users">],
+                deletedAt: msg.deletedAt
+                  ? [...msg.deletedAt, Date.now()]
+                  : [Date.now()],
+              });
+
+              // TODO: update last message to previous message
+              // if (index === 0) {
+              //   updateChat({
+              //     _id: activeChat?._id as Id<"chats">,
+              //     lastMessage: "_message was unsent_",
+              //     lastMessageSender: currentUser?._id as Id<"users">,
+              //     lastMessageTime: Date.now(),
+              //   });
+              // }
+            }}
+          >
+            <Trash2 size={20} />
+            <div>Delete for me</div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* NOTE: Keep this until this Issue is fixed: https://github.com/heroui-inc/heroui/issues/4786 */}
+      {/* <Dropdown
         placement={
           windowWidth >= 1024
             ? msg.sender === currentUser?._id
@@ -352,7 +449,7 @@ function MessageOptions({
           </Button>
         </DropdownTrigger>
         <DropdownMenu aria-label="Menu">
-          {/* Reply */}
+          // Reply
           <DropdownItem
             key="reply"
             color="default"
@@ -366,7 +463,7 @@ function MessageOptions({
 
           {msg.sender === currentUser?._id ? (
             <>
-              {/* Edit */}
+              // Edit
               <DropdownItem
                 key="edit"
                 color="default"
@@ -379,7 +476,7 @@ function MessageOptions({
                 Edit
               </DropdownItem>
 
-              {/* Unsend */}
+              // Unsend
               {msg._creationTime + 3600000 > Date.now() && (
                 <>
                   {!msg.unsentBy && (
@@ -412,7 +509,7 @@ function MessageOptions({
             </>
           ) : null}
 
-          {/* Delete */}
+          // Delete
           <DropdownItem
             key="delete"
             className="text-danger"
@@ -443,7 +540,8 @@ function MessageOptions({
             Delete for me
           </DropdownItem>
         </DropdownMenu>
-      </Dropdown>
+      </Dropdown> */}
+      {/* NOTE: Keep this until this Issue is fixed: https://github.com/heroui-inc/heroui/issues/4786 */}
 
       {/* Edit message modal */}
       <Modal

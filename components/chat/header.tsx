@@ -4,12 +4,6 @@ import { addToast } from "@heroui/toast";
 import { ArrowLeft, EllipsisVertical, Search, Trash2 } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
 import {
-  Dropdown,
-  DropdownItem,
-  DropdownMenu,
-  DropdownTrigger,
-} from "@heroui/dropdown";
-import {
   Modal,
   ModalContent,
   ModalHeader,
@@ -19,6 +13,12 @@ import {
 } from "@heroui/modal";
 import { useRouter } from "next/navigation";
 
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
@@ -87,6 +87,7 @@ export default function ChatHeader() {
         {/* CTA */}
         <div className="flex items-end gap-1">
           <Button
+            disableRipple
             isIconOnly
             radius="full"
             variant="light"
@@ -122,7 +123,23 @@ function Options() {
 
   return (
     <>
-      <Dropdown placement="bottom-end">
+      <DropdownMenu>
+        <DropdownMenuTrigger className="flex h-10 w-10 items-center justify-center rounded-full outline-none transition-all hover:bg-default/40">
+          <EllipsisVertical />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem
+            className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
+            onClick={onOpen}
+          >
+            <Trash2 size={20} />
+            <div>Delete chat</div>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* NOTE: Keep this until this Issue is fixed: https://github.com/heroui-inc/heroui/issues/4786 */}
+      {/* <Dropdown placement="bottom-end">
         <DropdownTrigger>
           <Button isIconOnly radius="full" variant="light">
             <EllipsisVertical />
@@ -139,7 +156,8 @@ function Options() {
             Delete
           </DropdownItem>
         </DropdownMenu>
-      </Dropdown>
+      </Dropdown> */}
+      {/* NOTE: Keep this until this Issue is fixed: https://github.com/heroui-inc/heroui/issues/4786 */}
 
       <Modal
         backdrop="blur"
@@ -152,15 +170,15 @@ function Options() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h3 className="text-2xl font-bold">Delete conversation</h3>
+                <h3 className="text-2xl font-bold">Delete chat</h3>
               </ModalHeader>
               <ModalBody>
                 <p>
-                  Are you sure you want to delete this conversation? This action
+                  Are you sure you want to delete this chat? This action
                   is irreversible.
                 </p>
                 <p>
-                  This will permanently delete the conversation for you and the
+                  This will permanently delete the chat for you and the
                   other participant.
                 </p>
               </ModalBody>
