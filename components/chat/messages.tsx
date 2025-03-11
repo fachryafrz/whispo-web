@@ -81,7 +81,7 @@ export default function ChatMessages() {
         className="relative flex h-full flex-1 flex-col-reverse items-center gap-1 overflow-y-auto p-4"
         onScroll={handleScroll}
       >
-        {/* TODO: Scroll to bottom */}
+        {/* Scroll to bottom */}
         <Button
           isIconOnly
           className={`fixed z-10 bg-black text-white transition-all dark:bg-white dark:text-black ${showScrollBtn ? "opacity-100" : "opacity-0"}`}
@@ -127,7 +127,7 @@ export default function ChatMessages() {
             );
           })}
 
-        {/* TODO: Paginate messages */}
+        {/* Paginate messages */}
         {status === "CanLoadMore" && (
           <div ref={loadMoreRef}>
             <Spinner color={resolvedTheme === "dark" ? "white" : "primary"} />

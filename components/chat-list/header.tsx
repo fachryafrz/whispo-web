@@ -33,6 +33,7 @@ export default function ChatListHeader() {
             <EllipsisVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
+            {/* Toggle theme */}
             <DropdownMenuItem className="cursor-pointer" onClick={onChange}>
               {resolvedTheme === "light" ? (
                 <Moon size={20} />
@@ -43,6 +44,8 @@ export default function ChatListHeader() {
                 {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
               </div>
             </DropdownMenuItem>
+
+            {/* Archive */}
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => {
@@ -78,20 +81,15 @@ export default function ChatListHeader() {
               {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
             </DropdownItem>
 
-            // TODO: Settings
+            // Archive
             <DropdownItem
               key="settings"
-              startContent={<Settings size={20} />}
-              onPress={() =>
-                addToast({
-                  title: "Settings",
-                  description:
-                    "Configure settings. This feature is coming soon.",
-                  color: "warning",
-                })
-              }
+              startContent={<Archive size={20} />}
+              onPress={() => {
+                setOpen(true);
+              }}
             >
-              Settings
+              Archived Chats
             </DropdownItem>
           </DropdownMenu>
         </Dropdown> */}
