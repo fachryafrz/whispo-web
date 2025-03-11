@@ -10,7 +10,6 @@ import { useSearchUser } from "@/zustand/search-user";
 import { api } from "@/convex/_generated/api";
 import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-import { Chat } from "@/types";
 import { arraysEqual } from "@/helper/arrays-equal";
 
 export default function SearchUser() {
@@ -19,11 +18,13 @@ export default function SearchUser() {
   const { activeChat, setActiveChat } = useChat();
 
   // React
-  const [isAdded, setIsAdded] = useState<Chat>();
+  const [isAdded, setIsAdded] = useState<Doc<"chats">>();
 
   // Convex
-  const chats = useQuery(api.chats.getChatsByCurrentUser);
   const currentUser = useQuery(api.users.getCurrentUser);
+  const chats = useQuery(api.chats.getChatsByCurrentUser, {
+    currentUser: currentUser?._id as Id<"users">,
+  });
   const users = useQuery(api.users.searchByUsername, {
     usernameQuery: query,
   });
@@ -31,13 +32,13 @@ export default function SearchUser() {
 
   // Functions
   const handleSelectUser = (user: Doc<"users">) => {
-    const value: Chat = {
+    const value = {
       type: "private",
       participants: [user._id, currentUser?._id as Id<"users">],
     };
 
     storeChat(value);
-    setIsAdded(value);
+    setIsAdded(value as Doc<"chats">);
   };
 
   useEffect(() => {
@@ -46,7 +47,7 @@ export default function SearchUser() {
         arraysEqual(chat.participants, isAdded?.participants as Id<"users">[]),
       );
 
-      setActiveChat(chatData as Chat);
+      setActiveChat(chatData as Doc<"chats">);
     }
   }, [isAdded, chats]);
 

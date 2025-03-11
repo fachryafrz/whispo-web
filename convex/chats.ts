@@ -3,7 +3,6 @@ import { v } from "convex/values";
 import { mutation, query } from "./_generated/server";
 
 import { arraysEqual } from "@/helper/arrays-equal";
-import { Chat } from "@/types";
 
 export const get = query({
   args: {},
@@ -13,33 +12,31 @@ export const get = query({
 });
 
 export const getChatsByCurrentUser = query({
-  args: {},
-  handler: async (ctx) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) {
-      // throw new Error("Not authenticated");
-      return;
-    }
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier),
-      )
-      .first();
-
-    if (!user) {
-      // throw new Error("User not found");
-      return [];
-    }
-
+  args: {
+    currentUser: v.id("users"),
+  },
+  handler: async (ctx, args) => {
     const allChats = await ctx.db.query("chats").collect();
     const userChats = allChats.filter((chat) =>
-      chat.participants.some((participant) => participant === user._id),
+      chat.participants.some((participant) => participant === args.currentUser),
     );
 
     return userChats;
+  },
+});
+
+export const getArchivedChatsByCurrentUser = query({
+  args: {
+    currentUser: v.id("users"),
+  },
+  handler: async (ctx, args) => {
+    const allChats = await ctx.db.query("chats").collect();
+    const userChats = allChats.filter((chat) =>
+      chat.participants.some((participant) => participant === args.currentUser),
+    );
+    const archivedChats = userChats.filter((chat) => chat.archived);
+
+    return archivedChats;
   },
 });
 
@@ -65,7 +62,11 @@ export const getChatById = query({
 });
 
 export const store = mutation({
-  handler: async (ctx, args: Chat) => {
+  args: {
+    type: v.string(),
+    participants: v.array(v.id("users")),
+  },
+  handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
     if (!identity) {
@@ -73,6 +74,7 @@ export const store = mutation({
       return;
     }
 
+    // Get current user
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
@@ -85,11 +87,13 @@ export const store = mutation({
       return;
     }
 
+    // Check chats with same type
     const existingChats = await ctx.db
       .query("chats")
       .withIndex("by_type", (q) => q.eq("type", args.type))
       .collect(); // Ambil semua chat dengan tipe yang sama
 
+    // Check chats with same participants
     const existingChat = existingChats.find((chat) =>
       arraysEqual(
         chat.participants.map((p) => p),
@@ -116,6 +120,26 @@ export const updateChatById = mutation({
   },
   handler: async (ctx, args) => {
     return await ctx.db.patch(args._id, args);
+  },
+});
+
+export const pinChat = mutation({
+  args: {
+    _id: v.id("chats"),
+    pinned: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args._id, { pinned: args.pinned });
+  },
+});
+
+export const archiveChat = mutation({
+  args: {
+    _id: v.id("chats"),
+    archived: v.boolean(),
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.patch(args._id, { archived: args.archived });
   },
 });
 

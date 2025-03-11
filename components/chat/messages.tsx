@@ -25,6 +25,7 @@ import {
 import { Textarea } from "@heroui/input";
 import { Spinner } from "@heroui/spinner";
 import { useInView } from "react-intersection-observer";
+import { useTheme } from "next-themes";
 
 import {
   DropdownMenu,
@@ -43,6 +44,7 @@ import { useReplyMessage } from "@/zustand/reply-message";
 const NUM_MESSAGES_TO_LOAD = 50;
 
 export default function ChatMessages() {
+  const { resolvedTheme } = useTheme();
   const { activeChat } = useChat();
   const { ref: loadMoreRef, inView, entry } = useInView();
 
@@ -79,7 +81,7 @@ export default function ChatMessages() {
         className="relative flex h-full flex-1 flex-col-reverse items-center gap-1 overflow-y-auto p-4"
         onScroll={handleScroll}
       >
-        {/* TODO: Scroll to bottom */}
+        {/* Scroll to bottom */}
         <Button
           isIconOnly
           className={`fixed z-10 bg-black text-white transition-all dark:bg-white dark:text-black ${showScrollBtn ? "opacity-100" : "opacity-0"}`}
@@ -125,10 +127,10 @@ export default function ChatMessages() {
             );
           })}
 
-        {/* TODO: Paginate messages */}
+        {/* Paginate messages */}
         {status === "CanLoadMore" && (
           <div ref={loadMoreRef}>
-            <Spinner color="white" />
+            <Spinner color={resolvedTheme === "dark" ? "white" : "primary"} />
           </div>
         )}
       </div>
@@ -337,9 +339,7 @@ function MessageOptions({
         <DropdownMenuTrigger className="flex h-10 w-10 items-center justify-center rounded-full outline-none transition-all hover:bg-default/40">
           <EllipsisVertical />
         </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align={`center`}
-        >
+        <DropdownMenuContent align={`center`}>
           {/* Reply */}
           <DropdownMenuItem
             className="cursor-pointer"

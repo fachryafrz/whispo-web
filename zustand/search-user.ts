@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-export type SearchUser = {
+type SearchUser = {
   open: boolean;
   setOpen: (open: boolean) => void;
 

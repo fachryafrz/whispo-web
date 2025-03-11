@@ -3,10 +3,10 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
+import SelectAChat from "./select-a-chat";
 import ChatHeader from "./header";
 import ChatMessages from "./messages";
 import ChatInput from "./input";
-import SelectAChat from "./select-a-chat";
 
 import { useChat } from "@/zustand/chat";
 
@@ -29,6 +29,10 @@ export default function Chat() {
       window.removeEventListener("keydown", handleKeyDown);
     };
   }, []);
+
+  useEffect(() =>{
+    console.log(activeChat)
+  },[activeChat])
 
   return (
     <>

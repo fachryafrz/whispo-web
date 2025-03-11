@@ -23,7 +23,7 @@ export default function ChatCard({
   info = true,
   timeSent,
   unreadCount, // TODO: Example: 53
-  pinned, // TODO: Example: true
+  pinned,
   onPress,
 }: ChatCardProps) {
   const router = useRouter();

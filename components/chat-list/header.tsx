@@ -3,8 +3,7 @@ import { useTheme } from "next-themes";
 import { Skeleton } from "@heroui/skeleton";
 import { Tooltip } from "@heroui/tooltip";
 import Link from "next/link";
-import { EllipsisVertical, Moon, Settings, Sun } from "lucide-react";
-import { addToast } from "@heroui/toast";
+import { Archive, EllipsisVertical, Moon, Sun } from "lucide-react";
 
 import Logo from "../logo";
 import {
@@ -15,9 +14,11 @@ import {
 } from "../ui/dropdown-menu";
 
 import { siteConfig } from "@/config/site";
+import { useArchivedChats } from "@/zustand/archived-chats";
 
 export default function ChatListHeader() {
   const { resolvedTheme, setTheme } = useTheme();
+  const { open, setOpen } = useArchivedChats();
 
   const onChange = () => {
     resolvedTheme === "light" ? setTheme("dark") : setTheme("light");
@@ -32,6 +33,7 @@ export default function ChatListHeader() {
             <EllipsisVertical />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="start">
+            {/* Toggle theme */}
             <DropdownMenuItem className="cursor-pointer" onClick={onChange}>
               {resolvedTheme === "light" ? (
                 <Moon size={20} />
@@ -42,19 +44,16 @@ export default function ChatListHeader() {
                 {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
               </div>
             </DropdownMenuItem>
+
+            {/* Archive */}
             <DropdownMenuItem
               className="cursor-pointer"
               onClick={() => {
-                addToast({
-                  title: "Settings",
-                  description:
-                    "Configure settings. This feature is coming soon.",
-                  color: "warning",
-                });
+                setOpen(true);
               }}
             >
-              <Settings size={20} />
-              <div>Settings</div>
+              <Archive size={20} />
+              <div>Archived Chats</div>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -82,20 +81,15 @@ export default function ChatListHeader() {
               {resolvedTheme === "light" ? "Dark Mode" : "Light Mode"}
             </DropdownItem>
 
-            // TODO: Settings
+            // Archive
             <DropdownItem
               key="settings"
-              startContent={<Settings size={20} />}
-              onPress={() =>
-                addToast({
-                  title: "Settings",
-                  description:
-                    "Configure settings. This feature is coming soon.",
-                  color: "warning",
-                })
-              }
+              startContent={<Archive size={20} />}
+              onPress={() => {
+                setOpen(true);
+              }}
             >
-              Settings
+              Archived Chats
             </DropdownItem>
           </DropdownMenu>
         </Dropdown> */}

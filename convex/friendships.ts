@@ -1,7 +1,7 @@
 
+import { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
 
-import { Friendship } from "@/types";
 
 export const get = query({
   args: {},
@@ -11,13 +11,13 @@ export const get = query({
 });
 
 export const store = mutation({
-  handler: async (ctx, args: Friendship) => {
+  handler: async (ctx, args: Doc<"friendships">) => {
     return await ctx.db.insert("friendships", args);
   },
 });
 
 export const check = query({
-  handler: async (ctx, args: Friendship) => {
+  handler: async (ctx, args: Doc<"friendships">) => {
     return await ctx.db
       .query("friendships")
       .filter((q) => q.eq(q.field("user1"), args.user1))
