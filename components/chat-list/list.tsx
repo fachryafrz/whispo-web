@@ -8,16 +8,13 @@ import { ChatListCard } from "./list-card";
 import { useSearchUser } from "@/zustand/search-user";
 import { api } from "@/convex/_generated/api";
 import { useArchivedChats } from "@/zustand/archived-chats";
-import { Id } from "@/convex/_generated/dataModel";
 
 export default function List() {
   const { open: openSearchUser, setOpen: setOpenSearchUser } = useSearchUser();
   const { open: openArchived } = useArchivedChats();
 
   const currentUser = useQuery(api.users.getCurrentUser);
-  const chats = useQuery(api.chats.getChatsByCurrentUser, {
-    currentUser: currentUser?._id as Id<"users">,
-  });
+  const chats = useQuery(api.chats.getChatsByCurrentUser);
 
   return (
     <div

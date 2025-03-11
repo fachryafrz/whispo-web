@@ -12,13 +12,30 @@ export const get = query({
 });
 
 export const getChatsByCurrentUser = query({
-  args: {
-    currentUser: v.id("users"),
-  },
+  args: {},
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      // throw new Error("Not authenticated");
+      return;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) {
+      // throw new Error("User not found");
+      return [];
+    }
+
     const allChats = await ctx.db.query("chats").collect();
     const userChats = allChats.filter((chat) =>
-      chat.participants.some((participant) => participant === args.currentUser),
+      chat.participants.some((participant) => participant === user._id),
     );
 
     return userChats;
@@ -26,13 +43,30 @@ export const getChatsByCurrentUser = query({
 });
 
 export const getArchivedChatsByCurrentUser = query({
-  args: {
-    currentUser: v.id("users"),
-  },
+  args: {},
   handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) {
+      // throw new Error("Not authenticated");
+      return;
+    }
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) {
+      // throw new Error("User not found");
+      return [];
+    }
+
     const allChats = await ctx.db.query("chats").collect();
     const userChats = allChats.filter((chat) =>
-      chat.participants.some((participant) => participant === args.currentUser),
+      chat.participants.some((participant) => participant === user._id),
     );
     const archivedChats = userChats.filter((chat) => chat.archived);
 

@@ -20,10 +20,7 @@ export default function ArchivedChats() {
   const [isAdded, setIsAdded] = useState<Doc<"chats">>();
 
   // Convex
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const chats = useQuery(api.chats.getArchivedChatsByCurrentUser, {
-    currentUser: currentUser?._id as Id<"users">,
-  });
+  const chats = useQuery(api.chats.getArchivedChatsByCurrentUser);
 
   useEffect(() => {
     if (isAdded) {
