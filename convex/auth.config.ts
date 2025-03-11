@@ -1,7 +1,7 @@
 export default {
   providers: [
     {
-      domain: "https://polished-monitor-18.clerk.accounts.dev",
+      domain: process.env.CLERK_ISSUER,
       applicationID: "convex",
     },
   ],
