@@ -2,8 +2,7 @@ import { v } from "convex/values";
 import { paginationOptsValidator } from "convex/server";
 
 import { mutation, query } from "./_generated/server";
-import { Doc, Id } from "./_generated/dataModel";
-
+import { Id } from "./_generated/dataModel";
 
 export const get = query({
   args: {},
@@ -48,7 +47,13 @@ export const getMessageById = query({
 });
 
 export const store = mutation({
-  handler: async (ctx, args: Doc<"messages">) => {
+  args: {
+    chat: v.id("chats"),
+    sender: v.id("users"),
+    content: v.string(),
+    replyTo: v.optional(v.id("messages")),
+  },
+  handler: async (ctx, args) => {
     if (!args.sender || !args.chat || !args.content) return;
 
     return await ctx.db.insert("messages", args);

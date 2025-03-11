@@ -21,8 +21,10 @@ export default function SearchUser() {
   const [isAdded, setIsAdded] = useState<Doc<"chats">>();
 
   // Convex
-  const chats = useQuery(api.chats.getChatsByCurrentUser);
   const currentUser = useQuery(api.users.getCurrentUser);
+  const chats = useQuery(api.chats.getChatsByCurrentUser, {
+    currentUser: currentUser?._id as Id<"users">,
+  });
   const users = useQuery(api.users.searchByUsername, {
     usernameQuery: query,
   });
