@@ -39,7 +39,7 @@ export default function List() {
       {(chats?.length === 0 || chats?.every((chat) => !chat.lastMessage)) && (
         <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-default-500">
           <h2 className="text-lg font-bold">No chats</h2>
-          <p className="text-sm">Start a new conversation</p>
+          <p className="text-sm">Start a new chat</p>
         </div>
       )}
 
