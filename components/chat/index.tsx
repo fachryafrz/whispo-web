@@ -30,10 +30,6 @@ export default function Chat() {
     };
   }, []);
 
-  useEffect(() =>{
-    console.log(activeChat)
-  },[activeChat])
-
   return (
     <>
       {activeChat ? (

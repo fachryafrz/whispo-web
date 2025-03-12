@@ -11,6 +11,12 @@ export const get = query({
   },
 });
 
+export const generateUploadUrl = mutation({
+  handler: async (ctx) => {
+    return await ctx.storage.generateUploadUrl();
+  },
+});
+
 export const getMessagesByChatId = query({
   args: {
     chatId: v.id("chats"),
@@ -46,12 +52,24 @@ export const getMessageById = query({
   },
 });
 
+export const getMessageMedia = query({
+  args: {
+    _id: v.optional(v.id("_storage")),
+  },
+  handler: async (ctx, args) => {
+    if (!args._id) return;
+
+    return await ctx.storage.getUrl(args._id);
+  },
+});
+
 export const store = mutation({
   args: {
     chat: v.id("chats"),
     sender: v.id("users"),
     content: v.string(),
     replyTo: v.optional(v.id("messages")),
+    mediaUrl: v.optional(v.id("_storage")),
   },
   handler: async (ctx, args) => {
     if (!args.sender || !args.chat || !args.content) return;

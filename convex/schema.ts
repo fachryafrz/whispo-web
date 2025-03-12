@@ -35,7 +35,7 @@ export default defineSchema({
     chat: v.id("chats"),
     sender: v.id("users"),
     content: v.string(),
-    mediaUrl: v.optional(v.string()),
+    mediaUrl: v.optional(v.id("_storage")),
     readBy: v.optional(v.array(v.id("users"))),
     editedBy: v.optional(v.id("users")),
     replyTo: v.optional(v.id("messages")),

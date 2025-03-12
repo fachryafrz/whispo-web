@@ -1,10 +1,12 @@
+/* eslint-disable @next/next/no-img-element */
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
-import { addToast } from "@heroui/toast";
 import { useMutation, useQuery } from "convex/react";
 import { Paperclip, SendHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import ReactMarkdown from "react-markdown";
+import { addToast } from "@heroui/toast";
+
+import ReplyTo from "./reply-to";
 
 import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
@@ -13,31 +15,56 @@ import { handleKeyDown } from "@/utils/handle-textarea-key-down";
 import { useReplyMessage } from "@/zustand/reply-message";
 
 export default function ChatInput() {
+  // Zustand
   const { activeChat } = useChat();
   const { replyMessageId, clearReplyTo } = useReplyMessage();
 
+  // State
   const formRef = useRef<HTMLFormElement>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const imageInput = useRef<HTMLInputElement>(null);
   const [text, setText] = useState<string>();
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
+  // Convex
   const currentUser = useQuery(api.users.getCurrentUser);
-
+  const generateUploadUrl = useMutation(api.messages.generateUploadUrl);
   const storeMessage = useMutation(api.messages.store);
   const updateChat = useMutation(api.chats.updateChatById);
 
-  const sendMessage = (e: React.FormEvent) => {
+  const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!text!.trim()) return;
+
+    let storageId;
+
+    if (selectedImage) {
+      // Step 1: Get a short-lived upload URL
+      const postUrl = await generateUploadUrl();
+
+      // Step 2: POST the file to the URL
+      const result = await fetch(postUrl, {
+        method: "POST",
+        headers: { "Content-Type": selectedImage!.type },
+        body: selectedImage,
+      });
+      const response = await result.json();
+
+      storageId = response.storageId;
+    }
 
     storeMessage({
       chat: activeChat?._id as Id<"chats">,
       sender: currentUser?._id as Id<"users">,
       content: text as string,
       replyTo: (replyMessageId as Id<"messages">) || undefined,
+      mediaUrl: storageId,
     }).then(() => {
       setText("");
       clearReplyTo();
+      setSelectedImage(null);
+      imageInput.current!.value = "";
     });
 
     updateChat({
@@ -63,6 +90,30 @@ export default function ChatInput() {
       {/* Reply to */}
       {replyMessageId && <ReplyTo />}
 
+      {/* TODO: Media */}
+      {selectedImage && (
+        <div className="ml-12 flex items-center gap-2">
+          <div className="relative overflow-hidden rounded-md before:absolute before:inset-0 before:bg-black before:opacity-50">
+            <img
+              alt=""
+              className="h-20 w-20 object-cover"
+              draggable={false}
+              src={URL.createObjectURL(selectedImage)}
+            />
+
+            <button
+              className="absolute right-1 top-1"
+              onClick={() => {
+                setSelectedImage(null);
+                imageInput.current!.value = "";
+              }}
+            >
+              <X size={20} />
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Message input */}
       <form
         ref={formRef}
@@ -70,22 +121,38 @@ export default function ChatInput() {
         onSubmit={sendMessage}
       >
         {/* Attachments */}
-        <Button
-          isIconOnly
-          radius="full"
-          type="button"
-          variant="light"
-          onPress={() =>
-            addToast({
-              title: "Add attachments",
-              description:
-                "Upload images and files. This feature is coming soon.",
-              color: "warning",
-            })
-          }
-        >
-          <Paperclip size={20} />
-        </Button>
+        <div>
+          <Button
+            isIconOnly
+            radius="full"
+            type="button"
+            variant="light"
+            onPress={() => {
+              imageInput.current?.click();
+            }}
+          >
+            <Paperclip size={20} />
+          </Button>
+
+          <input
+            ref={imageInput}
+            accept="image/*"
+            className="sr-only"
+            type="file"
+            onChange={(event) => {
+              if (event.target.files![0].size > 1024 * 1024) {
+                addToast({
+                  title: "File too large",
+                  description: "File size must be less than 1MB",
+                });
+
+                return;
+              }
+
+              setSelectedImage(event.target.files![0]);
+            }}
+          />
+        </div>
 
         {/* Message */}
         <Textarea
@@ -115,59 +182,5 @@ export default function ChatInput() {
         </Button>
       </form>
     </div>
-  );
-}
-
-function ReplyTo() {
-  const { replyMessageId, clearReplyTo } = useReplyMessage();
-
-  const getMessage = useQuery(api.messages.getMessageById, {
-    _id: replyMessageId as Id<"messages">,
-  });
-
-  return (
-    <>
-      {getMessage && (
-        <div className="flex items-center gap-2">
-          {/* Reply info */}
-          <div className="pointer-events-none ml-12 flex-1 space-y-1 rounded-md bg-default p-2 text-xs">
-            {/* Title */}
-            <span className="block font-semibold">
-              Reply to {getMessage?.sender?.username}
-            </span>
-
-            {/* Content */}
-            <div
-              className={`prose max-h-20 max-w-none overflow-hidden text-xs text-black marker:text-black dark:text-white dark:marker:text-white`}
-            >
-              <ReactMarkdown
-                components={{
-                  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                  blockquote: ({ node, ...props }) => (
-                    <blockquote {...props} className={`dark:text-white`}>
-                      {props.children}
-                    </blockquote>
-                  ),
-                }}
-              >
-                {getMessage.unsentBy
-                  ? `_message was unsent_`
-                  : getMessage?.content}
-              </ReactMarkdown>
-            </div>
-          </div>
-
-          {/* Clear */}
-          <Button
-            isIconOnly
-            radius="full"
-            variant="light"
-            onPress={clearReplyTo}
-          >
-            <X size={20} />
-          </Button>
-        </div>
-      )}
-    </>
   );
 }
