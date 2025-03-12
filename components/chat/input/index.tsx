@@ -137,6 +137,7 @@ export default function ChatInput() {
         <div>
           <Button
             isIconOnly
+            isDisabled={isLoading}
             radius="full"
             type="button"
             variant="light"
@@ -151,6 +152,7 @@ export default function ChatInput() {
             ref={imageInput}
             accept="image/*"
             className="sr-only"
+            disabled={isLoading}
             type="file"
             onChange={(event) => {
               if (event.target.files![0].size > 1024 * 1024) {
@@ -170,6 +172,7 @@ export default function ChatInput() {
         {/* Message */}
         <Textarea
           ref={textareaRef}
+          isDisabled={isLoading}
           minRows={1}
           placeholder="Type a message"
           radius="full"
