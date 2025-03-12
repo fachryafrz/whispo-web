@@ -68,87 +68,78 @@ export default function MessageOptions({
           {/* Options for message by current user */}
           {msg.sender === currentUser?._id ? (
             <>
-              {/* Message before 1 hour */}
-              {msg._creationTime + 3600000 > Date.now() && (
+              {/* If message is not unsent */}
+              {!msg.unsentBy && (
                 <>
-                  {/* If message is not unsent */}
-                  {!msg.unsentBy && (
-                    <>
-                      {/* Edit */}
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => {
-                          setMessage(msg.content);
-                          onOpen();
-                        }}
-                      >
-                        <Pencil size={20} />
-                        <div>Edit</div>
-                      </DropdownMenuItem>
+                  {/* Edit */}
+                  <DropdownMenuItem
+                    className="cursor-pointer"
+                    onClick={() => {
+                      setMessage(msg.content);
+                      onOpen();
+                    }}
+                  >
+                    <Pencil size={20} />
+                    <div>Edit</div>
+                  </DropdownMenuItem>
 
-                      {/* Unsend */}
-                      <DropdownMenuItem
-                        className="cursor-pointer"
-                        onClick={() => {
-                          unsendMessage({
-                            _id: msg._id as Id<"messages">,
-                            unsentBy: currentUser?._id as Id<"users">,
-                            unsentAt: Date.now(),
-                          });
+                  {/* Unsend */}
+                  <DropdownMenuItem
+                    className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
+                    onClick={() => {
+                      unsendMessage({
+                        _id: msg._id as Id<"messages">,
+                        unsentBy: currentUser?._id as Id<"users">,
+                        unsentAt: Date.now(),
+                      });
 
-                          if (index === 0) {
-                            updateChat({
-                              _id: activeChat?._id as Id<"chats">,
-                              lastMessage: "_message was unsent_",
-                              lastMessageSender:
-                                currentUser?._id as Id<"users">,
-                              lastMessageTime: Date.now(),
-                            });
-                          }
-                        }}
-                      >
-                        <Undo2 size={20} />
-                        <div>Unsend</div>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                      if (index === 0) {
+                        updateChat({
+                          _id: activeChat?._id as Id<"chats">,
+                          lastMessage: "_message was unsent_",
+                          lastMessageSender: currentUser?._id as Id<"users">,
+                          lastMessageTime: Date.now(),
+                        });
+                      }
+                    }}
+                  >
+                    <Undo2 size={20} />
+                    <div>Unsend</div>
+                  </DropdownMenuItem>
+                </>
+              )}
 
-                  {/* If message was unsent */}
-                  {msg.unsentBy && (
-                    <>
-                      {/* Delete */}
-                      <DropdownMenuItem
-                        className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
-                        onClick={() => {
-                          deleteMessage({
-                            _id: msg._id as Id<"messages">,
-                            deletedBy: msg.deletedBy
-                              ? [
-                                  ...msg.deletedBy,
-                                  currentUser?._id as Id<"users">,
-                                ]
-                              : [currentUser?._id as Id<"users">],
-                            deletedAt: msg.deletedAt
-                              ? [...msg.deletedAt, Date.now()]
-                              : [Date.now()],
-                          });
+              {/* If message was unsent */}
+              {msg.unsentBy && (
+                <>
+                  {/* Delete */}
+                  <DropdownMenuItem
+                    className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
+                    onClick={() => {
+                      deleteMessage({
+                        _id: msg._id as Id<"messages">,
+                        deletedBy: msg.deletedBy
+                          ? [...msg.deletedBy, currentUser?._id as Id<"users">]
+                          : [currentUser?._id as Id<"users">],
+                        deletedAt: msg.deletedAt
+                          ? [...msg.deletedAt, Date.now()]
+                          : [Date.now()],
+                      });
 
-                          // TODO: update last message to previous message
-                          // if (index === 0) {
-                          //   updateChat({
-                          //     _id: activeChat?._id as Id<"chats">,
-                          //     lastMessage: "_message was unsent_",
-                          //     lastMessageSender: currentUser?._id as Id<"users">,
-                          //     lastMessageTime: Date.now(),
-                          //   });
-                          // }
-                        }}
-                      >
-                        <Trash2 size={20} />
-                        <div>Delete for me</div>
-                      </DropdownMenuItem>
-                    </>
-                  )}
+                      // TODO: update last message to previous message
+                      // if (index === 0) {
+                      //   updateChat({
+                      //     _id: activeChat?._id as Id<"chats">,
+                      //     lastMessage: "_message was unsent_",
+                      //     lastMessageSender: currentUser?._id as Id<"users">,
+                      //     lastMessageTime: Date.now(),
+                      //   });
+                      // }
+                    }}
+                  >
+                    <Trash2 size={20} />
+                    <div>Delete for me</div>
+                  </DropdownMenuItem>
                 </>
               )}
             </>
