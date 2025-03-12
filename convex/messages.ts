@@ -4,13 +4,6 @@ import { paginationOptsValidator } from "convex/server";
 import { mutation, query } from "./_generated/server";
 import { Id } from "./_generated/dataModel";
 
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("messages").collect();
-  },
-});
-
 export const generateUploadUrl = mutation({
   handler: async (ctx) => {
     return await ctx.storage.generateUploadUrl();

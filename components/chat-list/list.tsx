@@ -1,7 +1,10 @@
 import { Button } from "@heroui/button";
 import { Plus } from "lucide-react";
-import { useQuery } from "convex/react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { Tooltip } from "@heroui/tooltip";
+import { useInView } from "react-intersection-observer";
+import { Spinner } from "@heroui/spinner";
+import { useEffect } from "react";
 
 import { ChatListCard } from "./list-card";
 
@@ -9,12 +12,32 @@ import { useSearchUser } from "@/zustand/search-user";
 import { api } from "@/convex/_generated/api";
 import { useArchivedChats } from "@/zustand/archived-chats";
 
+const NUM_CHATS_TO_LOAD = 20;
+
 export default function List() {
   const { open: openSearchUser, setOpen: setOpenSearchUser } = useSearchUser();
   const { open: openArchived } = useArchivedChats();
+  const { ref: loadMoreRef, inView } = useInView();
 
+  // Convex
   const currentUser = useQuery(api.users.getCurrentUser);
-  const chats = useQuery(api.chats.getChatsByCurrentUser);
+  const {
+    results: allChats,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.chats.getAllChats,
+    {},
+    { initialNumItems: NUM_CHATS_TO_LOAD },
+  );
+
+  const chats = allChats.filter((chat) =>
+    chat.participants.some((participant) => participant === currentUser?._id),
+  );
+
+  useEffect(() => {
+    if (inView) loadMore(NUM_CHATS_TO_LOAD);
+  }, [inView]);
 
   return (
     <div
@@ -25,7 +48,7 @@ export default function List() {
         <Tooltip content="New chat">
           <Button
             isIconOnly
-            className="w-14 h-14"
+            className="h-14 w-14"
             radius="full"
             size="lg"
             onPress={() => setOpenSearchUser(true)}
@@ -69,6 +92,13 @@ export default function List() {
                   <ChatListCard chat={chat} />
                 </li>
               ))}
+
+            {/* Load more */}
+            {status === "CanLoadMore" && (
+              <li ref={loadMoreRef} className="flex w-full justify-center py-2">
+                <Spinner />
+              </li>
+            )}
           </ul>
         )}
     </div>

@@ -39,9 +39,7 @@ export default function ChatMessages() {
   };
 
   useEffect(() => {
-    if (inView) {
-      loadMore(NUM_MESSAGES_TO_LOAD);
-    }
+    if (inView) loadMore(NUM_MESSAGES_TO_LOAD);
   }, [inView]);
 
   return (

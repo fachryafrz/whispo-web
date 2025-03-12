@@ -1,14 +1,5 @@
-
 import { Doc } from "./_generated/dataModel";
 import { mutation, query } from "./_generated/server";
-
-
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("friendships").collect();
-  },
-});
 
 export const store = mutation({
   handler: async (ctx, args: Doc<"friendships">) => {

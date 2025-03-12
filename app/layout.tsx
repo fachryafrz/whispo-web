@@ -67,14 +67,14 @@ export default function RootLayout({
       <head />
       <body
         className={clsx(
-          "min-h-screen bg-background font-sans antialiased",
+          "min-h-svh bg-background font-sans antialiased",
           fontSans.variable,
         )}
       >
         <Providers themeProps={{ attribute: "class", defaultTheme: "dark" }}>
           <ConvexClientProvider>
             <main>
-              <div className={`relative flex h-screen`}>
+              <div className={`relative flex h-svh`}>
                 <ChatList />
 
                 {children}

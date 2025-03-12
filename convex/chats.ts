@@ -1,13 +1,16 @@
 import { v } from "convex/values";
+import { paginationOptsValidator } from "convex/server";
 
 import { mutation, query } from "./_generated/server";
 
 import { arraysEqual } from "@/helper/arrays-equal";
 
-export const get = query({
-  args: {},
-  handler: async (ctx) => {
-    return await ctx.db.query("chats").collect();
+export const getAllChats = query({
+  args: {
+    paginationOpts: paginationOptsValidator,
+  },
+  handler: async (ctx, args) => {
+    return await ctx.db.query("chats").paginate(args.paginationOpts);
   },
 });
 

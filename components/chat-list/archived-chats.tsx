@@ -1,42 +1,44 @@
-import { useQuery } from "convex/react";
-import { useEffect, useState } from "react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { Button } from "@heroui/button";
 import { ArrowLeft } from "lucide-react";
+import { Spinner } from "@heroui/spinner";
+import { useInView } from "react-intersection-observer";
+import { useEffect } from "react";
 
 import { ChatListCard } from "./list-card";
 
 import { api } from "@/convex/_generated/api";
 import { useChat } from "@/zustand/chat";
-import { Doc, Id } from "@/convex/_generated/dataModel";
-import { arraysEqual } from "@/helper/arrays-equal";
 import { useArchivedChats } from "@/zustand/archived-chats";
+
+const NUM_CHATS_TO_LOAD = 20;
 
 export default function ArchivedChats() {
   // Zustand
   const { open, setOpen } = useArchivedChats();
   const { activeChat, setActiveChat } = useChat();
-
-  // React
-  const [isAdded, setIsAdded] = useState<Doc<"chats">>();
+  const { ref: loadMoreRef, inView } = useInView();
 
   // Convex
-  const chats = useQuery(api.chats.getArchivedChatsByCurrentUser);
+  const currentUser = useQuery(api.users.getCurrentUser);
+  const {
+    results: allChats,
+    status,
+    loadMore,
+  } = usePaginatedQuery(
+    api.chats.getAllChats,
+    {},
+    { initialNumItems: NUM_CHATS_TO_LOAD },
+  );
+
+  const userChats = allChats.filter((chat) =>
+    chat.participants.some((participant) => participant === currentUser?._id),
+  );
+  const chats = userChats.filter((chat) => chat.archived);
 
   useEffect(() => {
-    if (isAdded) {
-      const chatData = chats?.find((chat) =>
-        arraysEqual(chat.participants, isAdded?.participants as Id<"users">[]),
-      );
-
-      setActiveChat(chatData as Doc<"chats">);
-    }
-  }, [isAdded, chats]);
-
-  useEffect(() => {
-    if (activeChat) {
-      setIsAdded(undefined);
-    }
-  }, [activeChat]);
+    if (inView) loadMore(NUM_CHATS_TO_LOAD);
+  }, [inView]);
 
   return (
     <div
@@ -76,6 +78,13 @@ export default function ArchivedChats() {
                 <ChatListCard chat={chat} />
               </li>
             ))}
+
+          {/* Load more */}
+          {status === "CanLoadMore" && (
+            <li ref={loadMoreRef} className="flex w-full justify-center py-2">
+              <Spinner />
+            </li>
+          )}
         </ul>
       )}
     </div>
