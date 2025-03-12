@@ -22,7 +22,7 @@ export default function ChatCard({
   imageUrl,
   info = true,
   timeSent,
-  unreadCount, // TODO: Example: 53
+  unreadCount,
   pinned,
   onPress,
 }: ChatCardProps) {
@@ -64,7 +64,7 @@ export default function ChatCard({
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   p: ({ node, ...props }) => (
                     <p
-                      className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500"
+                      className={`overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500 ${unreadCount ? "font-bold text-white" : ""}`}
                       {...props}
                     />
                   ),

@@ -16,7 +16,7 @@ export default function Media({ msg }: { msg: Doc<"messages"> }) {
           <div className="relative overflow-hidden rounded-md">
             <img
               alt=""
-              className="max-h-[300px] object-cover"
+              className="max-h-[500px] object-cover"
               draggable={false}
               src={getMessageMedia}
             />

@@ -138,6 +138,17 @@ export const store = mutation({
     if (existingChat) {
       await ctx.db.patch(existingChat._id, args);
 
+      const unreadMessages = await ctx.db
+        .query("unread_messages")
+        .withIndex("by_user_chat", (q) =>
+          q.eq("user", user._id).eq("chat", existingChat._id),
+        )
+        .first();
+
+      if (unreadMessages) {
+        await ctx.db.delete(unreadMessages._id);
+      }
+
       return await ctx.db.get(existingChat._id);
     }
 
