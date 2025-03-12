@@ -83,6 +83,8 @@ export default function ChatInput() {
   useEffect(() => {
     setText("");
     clearReplyTo();
+    setSelectedImage(null);
+    imageInput.current!.value = "";
   }, [activeChat]);
 
   return (

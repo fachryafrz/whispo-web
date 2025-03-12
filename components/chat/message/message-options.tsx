@@ -50,7 +50,7 @@ export default function MessageOptions({
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger className="flex h-10 w-10 items-center justify-center rounded-full outline-none transition-all hover:bg-default/40">
+        <DropdownMenuTrigger className="sticky -bottom-4 flex h-10 w-10 items-center justify-center rounded-full outline-none transition-all hover:bg-default/40">
           <EllipsisVertical />
         </DropdownMenuTrigger>
         <DropdownMenuContent align={`center`}>
