@@ -99,13 +99,14 @@ export const unsendMessage = mutation({
     unsentAt: v.number(),
   },
   handler: async (ctx, args) => {
-    const message = await ctx.db
-      .query("messages")
-      .withIndex("by_id", (q) => q.eq("_id", args._id))
-      .first();
+    const message = await ctx.db.get(args._id);
 
     if (message!._creationTime + 3600000 < Date.now()) {
       throw new Error("You can only unsend a message within 1 hour");
+    }
+
+    if (message?.mediaUrl) {
+      ctx.storage.delete(message.mediaUrl);
     }
 
     return await ctx.db.patch(args._id, {

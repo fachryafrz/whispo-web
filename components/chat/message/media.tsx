@@ -13,7 +13,7 @@ export default function Media({ msg }: { msg: Doc<"messages"> }) {
     <>
       {getMessageMedia && (
         <div className="flex items-center gap-2">
-          <div className="relative overflow-hidden rounded-md before:absolute before:inset-0 before:bg-black before:opacity-50">
+          <div className="relative overflow-hidden rounded-md">
             <img
               alt=""
               className="max-h-[300px] object-cover"
