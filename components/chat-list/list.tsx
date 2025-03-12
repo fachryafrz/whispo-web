@@ -25,6 +25,7 @@ export default function List() {
         <Tooltip content="New chat">
           <Button
             isIconOnly
+            className="w-14 h-14"
             radius="full"
             size="lg"
             onPress={() => setOpenSearchUser(true)}
