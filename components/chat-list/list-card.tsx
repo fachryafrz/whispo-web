@@ -17,17 +17,20 @@ import { Doc, Id } from "@/convex/_generated/dataModel";
 
 export function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
   const { setActiveChat } = useChat();
+
+  // Convex
   const currentUser = useQuery(api.users.getCurrentUser);
   const chatById = useQuery(api.chats.getChatById, { _id: chat._id });
+  const storeChat = useMutation(api.chats.store);
+  const pinChat = useMutation(api.chats.pinChat);
+  const archiveChat = useMutation(api.chats.archiveChat);
+  const getUnread = useQuery(api.unread_messages.get, {
+    chat: chat._id as Id<"chats">,
+  });
 
   const interlocutor = chatById?.participants.find(
     (p) => p?._id !== currentUser?._id,
   );
-
-  const storeChat = useMutation(api.chats.store);
-  const pinChat = useMutation(api.chats.pinChat);
-  const archiveChat = useMutation(api.chats.archiveChat);
-
   const handleSelectChat = () => {
     const value = {
       type: chat.type,
@@ -60,6 +63,7 @@ export function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
                   ? (interlocutor?.name ?? "")
                   : (chat.name ?? "")
               }
+              unreadCount={getUnread?.count}
               onPress={() => handleSelectChat()}
             />
           </ContextMenuTrigger>

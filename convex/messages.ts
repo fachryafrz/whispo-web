@@ -74,6 +74,17 @@ export const store = mutation({
   handler: async (ctx, args) => {
     if (!args.sender || !args.chat || !args.content) return;
 
+    const unreadMessages = await ctx.db
+      .query("unread_messages")
+      .withIndex("by_user_chat", (q) =>
+        q.eq("user", args.sender).eq("chat", args.chat),
+      )
+      .first();
+
+    if (unreadMessages) {
+      await ctx.db.delete(unreadMessages._id);
+    }
+
     return await ctx.db.insert("messages", args);
   },
 });

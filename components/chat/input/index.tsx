@@ -31,6 +31,11 @@ export default function ChatInput() {
   const generateUploadUrl = useMutation(api.messages.generateUploadUrl);
   const storeMessage = useMutation(api.messages.store);
   const updateChat = useMutation(api.chats.updateChatById);
+  const storeUnreadMessage = useMutation(api.unread_messages.store);
+
+  const interlocutor = activeChat?.participants.find(
+    (p) => p !== currentUser?._id,
+  );
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -74,9 +79,10 @@ export default function ChatInput() {
       lastMessageTime: Date.now(),
     });
 
-    window.scrollTo({
-      top: document.body.scrollHeight,
-      behavior: "smooth",
+    storeUnreadMessage({
+      user: interlocutor as Id<"users">,
+      chat: activeChat?._id as Id<"chats">,
+      count: 1,
     });
   };
 

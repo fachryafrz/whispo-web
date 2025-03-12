@@ -24,7 +24,7 @@ export default defineSchema({
     lastMessageSender: v.optional(v.string()),
     lastMessageTime: v.optional(v.number()),
     pinned: v.optional(v.boolean()),
-    unreadCount: v.optional(v.number()),
+    // unreadCount: v.optional(v.number()),
     seenBy: v.optional(v.array(v.id("users"))),
     archived: v.optional(v.boolean()),
   })
@@ -44,6 +44,12 @@ export default defineSchema({
     unsentBy: v.optional(v.id("users")),
     unsentAt: v.optional(v.number()),
   }).index("by_chat", ["chat"]),
+
+  unread_messages: defineTable({
+    user: v.id("users"), // User that has unread messages
+    chat: v.id("chats"), // Related chat
+    count: v.number(), // Unread message count
+  }).index("by_user_chat", ["user", "chat"]),
 
   friendships: defineTable({
     user1: v.id("users"),
