@@ -35,10 +35,10 @@ export default function Message({
       >
         <div className="space-y-2 p-2">
           {/* Reply to */}
-          {msg.replyTo && <ReplyTo msg={msg} />}
+          {msg.replyTo && !msg.unsentBy && <ReplyTo msg={msg} />}
 
           {/* TODO: Media */}
-          {msg.mediaUrl && <Media msg={msg} />}
+          {msg.mediaUrl && !msg.unsentBy && <Media msg={msg} />}
 
           {/* Text content */}
           <div className="flex gap-2">
