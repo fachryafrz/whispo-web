@@ -55,5 +55,5 @@ Whispo is a fast, secure, and intuitive real-time chat application designed to e
   - 📝 Edit messages
   - ❌ Unsend messages
   - 🗑️ Delete messages
-  - 🖼️ Message with media (coming soon)
+  - 🖼️ Message with media
   - 📑 Auto load messages
