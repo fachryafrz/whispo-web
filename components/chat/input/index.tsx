@@ -25,6 +25,7 @@ export default function ChatInput() {
   const imageInput = useRef<HTMLInputElement>(null);
   const [text, setText] = useState<string>();
   const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   // Convex
   const currentUser = useQuery(api.users.getCurrentUser);
@@ -41,6 +42,8 @@ export default function ChatInput() {
     e.preventDefault();
 
     if (!text!.trim()) return;
+
+    setIsLoading(true);
 
     let storageId;
 
@@ -65,11 +68,6 @@ export default function ChatInput() {
       content: text as string,
       replyTo: (replyMessageId as Id<"messages">) || undefined,
       mediaUrl: storageId,
-    }).then(() => {
-      setText("");
-      clearReplyTo();
-      setSelectedImage(null);
-      imageInput.current!.value = "";
     });
 
     updateChat({
@@ -84,6 +82,12 @@ export default function ChatInput() {
       chat: activeChat?._id as Id<"chats">,
       count: 1,
     });
+
+    setText("");
+    clearReplyTo();
+    setSelectedImage(null);
+    imageInput.current!.value = "";
+    setIsLoading(false);
   };
 
   useEffect(() => {
@@ -91,6 +95,7 @@ export default function ChatInput() {
     clearReplyTo();
     setSelectedImage(null);
     imageInput.current!.value = "";
+    setIsLoading(false);
   }, [activeChat]);
 
   return (
@@ -183,10 +188,12 @@ export default function ChatInput() {
           disableAnimation
           isIconOnly
           className="bg-black text-white dark:bg-white dark:text-black"
+          isDisabled={isLoading}
+          isLoading={isLoading}
           radius="full"
           type="submit"
         >
-          <SendHorizontal size={20} />
+          {!isLoading && <SendHorizontal size={20} />}
         </Button>
       </form>
     </div>
