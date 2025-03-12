@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { EllipsisVertical, Pencil, Reply, Trash2, Undo2 } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
 
-import EditMessageModal from "../../../modal/edit-message";
+import EditMessageModal from "../../modal/edit-message";
 
 import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";

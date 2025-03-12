@@ -6,7 +6,7 @@ import { Spinner } from "@heroui/spinner";
 import { useInView } from "react-intersection-observer";
 import { useTheme } from "next-themes";
 
-import Message from "./message";
+import Message from "../message";
 
 import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
