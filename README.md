@@ -41,18 +41,19 @@ Whispo is a fast, secure, and intuitive real-time chat application designed to e
   - 🔤 Change Username
   - 🌍 Login with Google
 
-- ⚡ Real-time database with Convex
-  - 🔎 Search for users by username
+- 🔎 Search users by username
+- ✉️ Chat
+  - 📜 View chat history
+  - 🗑️ Delete chats
+  - 📂 Archive chats
+  - 📌 Pin chats
+  - 👥 Group chats (coming soon)
+  - 🔔 Unread count (coming soon)
+- 💬 Message
   - 💬 Send messages
   - ↩️ Reply to messages
   - 📝 Edit messages
   - ❌ Unsend messages
   - 🗑️ Delete messages
-  - 📜 View chat history
-  - 📑 Auto load messages
-  - 🗑️ Delete chats
   - 🖼️ Message with media (coming soon)
-  - 📂 Archive chats
-  - 📌 Pin chats
-  - 👥 Group chats (coming soon)
-  - 🔔 Unread count (coming soon)
+  - 📑 Auto load messages
