@@ -31,6 +31,22 @@ export default defineSchema({
     .index("by_type", ["type"])
     .index("by_participants_and_type", ["participants", "type"]),
 
+  pinned_chats: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["chatId"])
+    .index("by_user_chat", ["userId", "chatId"]),
+
+  archived_chats: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["chatId"])
+    .index("by_user_chat", ["userId", "chatId"]),
+
   messages: defineTable({
     chat: v.id("chats"),
     sender: v.id("users"),
@@ -49,7 +65,10 @@ export default defineSchema({
     user: v.id("users"), // User that has unread messages
     chat: v.id("chats"), // Related chat
     count: v.number(), // Unread message count
-  }).index("by_user_chat", ["user", "chat"]),
+  })
+    .index("by_user", ["user"])
+    .index("by_chat", ["chat"])
+    .index("by_user_chat", ["user", "chat"]),
 
   friendships: defineTable({
     user1: v.id("users"),

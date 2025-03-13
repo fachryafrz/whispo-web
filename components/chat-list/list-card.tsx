@@ -15,7 +15,15 @@ import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 
-export function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
+export function ChatListCard({
+  chat,
+  pinned,
+  archived,
+}: {
+  chat: Doc<"chats">;
+  pinned?: boolean;
+  archived?: boolean;
+}) {
   const { setActiveChat } = useChat();
 
   // Convex
@@ -56,7 +64,7 @@ export function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
                   ? (interlocutor?.avatarUrl ?? "")
                   : (chat.imageUrl ?? "")
               }
-              pinned={chat.pinned}
+              pinned={pinned}
               timeSent={dayjs(chat.lastMessageTime).format("HH:mm")}
               title={
                 chat.type === "private"
@@ -69,13 +77,12 @@ export function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
           </ContextMenuTrigger>
           <ContextMenuContent>
             {/* Pin chat */}
-            {!chat.archived && (
+            {!archived && (
               <ContextMenuItem
                 className="cursor-pointer space-x-2"
                 onClick={() => {
                   pinChat({
-                    _id: chat._id,
-                    pinned: !chat.pinned,
+                    chatId: chat._id,
                   });
                 }}
               >
@@ -89,20 +96,18 @@ export function ChatListCard({ chat }: { chat: Doc<"chats"> }) {
               className="cursor-pointer space-x-2"
               onClick={() => {
                 archiveChat({
-                  _id: chat._id,
-                  archived: !chat.archived,
+                  chatId: chat._id,
                 });
 
-                if (chat.pinned) {
-                  pinChat({
-                    _id: chat._id,
-                    pinned: false,
-                  });
-                }
+                // if (chat.pinned) {
+                //   pinChat({
+                //     chatId: chat._id,
+                //   });
+                // }
               }}
             >
               <Archive size={20} />
-              <div>{chat.archived ? "Remove from archive" : "Archive"}</div>
+              <div>{archived ? "Remove from archive" : "Archive"}</div>
             </ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>

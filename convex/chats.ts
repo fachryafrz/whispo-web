@@ -148,39 +148,180 @@ export const updateChatById = mutation({
   },
 });
 
+export const pinnedChats = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) return;
+
+    const pinnedChats = await ctx.db
+      .query("pinned_chats")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const chats = await Promise.all(
+      pinnedChats.map((pc) => ctx.db.get(pc.chatId)),
+    );
+
+    return chats;
+  },
+});
+
 export const pinChat = mutation({
   args: {
-    _id: v.id("chats"),
-    pinned: v.boolean(),
+    chatId: v.id("chats"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.patch(args._id, { pinned: args.pinned });
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) return;
+
+    const existing = await ctx.db
+      .query("pinned_chats")
+      .withIndex("by_user_chat", (q) =>
+        q.eq("userId", user._id).eq("chatId", args.chatId),
+      )
+      .first();
+
+    if (existing) {
+      return await ctx.db.delete(existing._id);
+    }
+
+    return await ctx.db.insert("pinned_chats", {
+      userId: user._id,
+      chatId: args.chatId,
+    });
+  },
+});
+
+export const archivedChats = query({
+  args: {},
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) return;
+
+    const pinnedChats = await ctx.db
+      .query("archived_chats")
+      .withIndex("by_user", (q) => q.eq("userId", user._id))
+      .collect();
+
+    const chats = await Promise.all(
+      pinnedChats.map((pc) => ctx.db.get(pc.chatId)),
+    );
+
+    return chats;
   },
 });
 
 export const archiveChat = mutation({
   args: {
-    _id: v.id("chats"),
-    archived: v.boolean(),
+    chatId: v.id("chats"),
   },
   handler: async (ctx, args) => {
-    return await ctx.db.patch(args._id, { archived: args.archived });
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) return;
+
+    const existing = await ctx.db
+      .query("archived_chats")
+      .withIndex("by_user_chat", (q) =>
+        q.eq("userId", user._id).eq("chatId", args.chatId),
+      )
+      .first();
+
+    if (existing) {
+      return await ctx.db.delete(existing._id);
+    }
+
+    const isPinned = await ctx.db
+      .query("pinned_chats")
+      .withIndex("by_user_chat", (q) =>
+        q.eq("userId", user._id).eq("chatId", args.chatId),
+      )
+      .first();
+
+    if (isPinned) {
+      await ctx.db.delete(isPinned._id);
+    }
+
+    return await ctx.db.insert("archived_chats", {
+      userId: user._id,
+      chatId: args.chatId,
+    });
   },
 });
 
 export const deleteChat = mutation({
-  args: { _id: v.id("chats") },
+  args: {
+    chatId: v.id("chats"),
+  },
   handler: async (ctx, args) => {
     const messages = await ctx.db
       .query("messages")
-      .withIndex("by_chat", (q) => q.eq("chat", args._id))
+      .withIndex("by_chat", (q) => q.eq("chat", args.chatId))
       .order("desc")
+      .collect();
+
+    const unreadMessages = await ctx.db
+      .query("unread_messages")
+      .withIndex("by_chat", (q) => q.eq("chat", args.chatId))
+      .collect();
+
+    const pinnedChats = await ctx.db
+      .query("pinned_chats")
+      .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
       .collect();
 
     for (const message of messages) {
       await ctx.db.delete(message._id);
     }
 
-    return await ctx.db.delete(args._id);
+    for (const unreadMessage of unreadMessages) {
+      await ctx.db.delete(unreadMessage._id);
+    }
+
+    for (const pinnedChat of pinnedChats) {
+      await ctx.db.delete(pinnedChat._id);
+    }
+
+    return await ctx.db.delete(args.chatId);
   },
 });

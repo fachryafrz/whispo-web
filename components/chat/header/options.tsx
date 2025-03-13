@@ -27,7 +27,7 @@ export default function Options() {
   const deleteChat = useMutation(api.chats.deleteChat);
 
   const handleDelete = () => {
-    deleteChat({ _id: activeChat?._id as Id<"chats"> });
+    deleteChat({ chatId: activeChat?._id as Id<"chats"> });
     clearActiveChat();
   };
 
