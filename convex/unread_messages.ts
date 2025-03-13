@@ -9,23 +9,16 @@ export const get = query({
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
 
-    if (!identity) {
-      // throw new Error("Not authenticated");
-      return;
-    }
+    if (!identity) return;
 
-    // Get current user
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
         q.eq("tokenIdentifier", identity.tokenIdentifier),
       )
-      .first();
+      .unique();
 
-    if (!user) {
-      // throw new Error("User not found");
-      return;
-    }
+    if (!user) return;
 
     return await ctx.db
       .query("unread_messages")
