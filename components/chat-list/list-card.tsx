@@ -98,12 +98,6 @@ export function ChatListCard({
                 archiveChat({
                   chatId: chat._id,
                 });
-
-                // if (chat.pinned) {
-                //   pinChat({
-                //     chatId: chat._id,
-                //   });
-                // }
               }}
             >
               <Archive size={20} />

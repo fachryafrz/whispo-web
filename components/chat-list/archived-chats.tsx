@@ -1,46 +1,18 @@
-import { usePaginatedQuery, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Button } from "@heroui/button";
 import { ArrowLeft } from "lucide-react";
-import { Spinner } from "@heroui/spinner";
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 
 import { ChatListCard } from "./list-card";
 
 import { api } from "@/convex/_generated/api";
-import { useChat } from "@/zustand/chat";
 import { useArchivedChats } from "@/zustand/archived-chats";
-
-const NUM_CHATS_TO_LOAD = 20;
 
 export default function ArchivedChats() {
   // Zustand
   const { open, setOpen } = useArchivedChats();
-  const { activeChat, setActiveChat } = useChat();
-  const { ref: loadMoreRef, inView } = useInView();
 
   // Convex
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const {
-    results: allChats,
-    status,
-    loadMore,
-  } = usePaginatedQuery(
-    api.chats.getAllChats,
-    {},
-    { initialNumItems: NUM_CHATS_TO_LOAD },
-  );
-
-  const userChats = allChats.filter((chat) =>
-    chat.participants.some((participant) => participant === currentUser?._id),
-  );
-  const chats = userChats.filter((chat) => chat.archived);
-
   const archivedChats = useQuery(api.chats.archivedChats);
-
-  useEffect(() => {
-    if (inView) loadMore(NUM_CHATS_TO_LOAD);
-  }, [inView]);
 
   return (
     <div
@@ -87,13 +59,6 @@ export default function ArchivedChats() {
               <ChatListCard archived chat={chat!} />
             </li>
           ))}
-
-        {/* Load more */}
-        {status === "CanLoadMore" && (
-          <li ref={loadMoreRef} className="flex w-full justify-center py-2">
-            <Spinner />
-          </li>
-        )}
       </ul>
     </div>
   );

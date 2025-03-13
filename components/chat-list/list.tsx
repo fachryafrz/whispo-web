@@ -71,7 +71,7 @@ export default function List() {
       {/* No chat */}
       {/* {(chats?.length === 0 ||
         pinnedChats?.length === 0 ||
-        chats?.every((chat) => !chat.lastMessage || chat.archived)) && (
+        chats?.every((chat) => !chat.lastMessage)) && (
         <div className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-default-500">
           <h2 className="text-lg font-bold">No chats</h2>
           <p className="text-sm">Start a new chat</p>
@@ -80,7 +80,7 @@ export default function List() {
 
       {/* List of chats */}
       {/* {chats?.length! > 0 &&
-        chats?.some((chat) => chat.lastMessage && !chat.archived) && ( */}
+        chats?.some((chat) => chat.lastMessage) && ( */}
       <ul className={`h-full overflow-y-auto`}>
         {/* No chats */}
         {((pinnedChats?.length === 0 && chats.length === 0) ||
@@ -104,7 +104,7 @@ export default function List() {
 
         {/* Chats */}
         {chats
-          ?.filter((chat) => chat.lastMessage && !chat.pinned && !chat.archived)
+          ?.filter((chat) => chat.lastMessage)
           .sort((a, b) => b.lastMessageTime! - a.lastMessageTime!)
           .map((chat) => (
             <li key={chat._id}>

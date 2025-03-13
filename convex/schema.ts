@@ -10,9 +10,7 @@ export default defineSchema({
     avatarUrl: v.string(),
   })
     .index("by_token", ["tokenIdentifier"])
-    .searchIndex("search_username", {
-      searchField: "username",
-    }),
+    .searchIndex("search_username", { searchField: "username" }),
 
   chats: defineTable({
     type: v.string(), // "private" or "group"
@@ -23,13 +21,7 @@ export default defineSchema({
     lastMessage: v.optional(v.string()),
     lastMessageSender: v.optional(v.string()),
     lastMessageTime: v.optional(v.number()),
-    pinned: v.optional(v.boolean()),
-    // unreadCount: v.optional(v.number()),
-    seenBy: v.optional(v.array(v.id("users"))),
-    archived: v.optional(v.boolean()),
-  })
-    .index("by_type", ["type"])
-    .index("by_participants_and_type", ["participants", "type"]),
+  }).index("by_type", ["type"]),
 
   pinned_chats: defineTable({
     chatId: v.id("chats"),

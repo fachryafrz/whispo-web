@@ -40,32 +40,6 @@ export const getChatsByCurrentUser = query({
   },
 });
 
-export const getArchivedChatsByCurrentUser = query({
-  args: {},
-  handler: async (ctx, args) => {
-    const identity = await ctx.auth.getUserIdentity();
-
-    if (!identity) return;
-
-    const user = await ctx.db
-      .query("users")
-      .withIndex("by_token", (q) =>
-        q.eq("tokenIdentifier", identity.tokenIdentifier),
-      )
-      .unique();
-
-    if (!user) return [];
-
-    const allChats = await ctx.db.query("chats").collect();
-    const userChats = allChats.filter((chat) =>
-      chat.participants.some((participant) => participant === user._id),
-    );
-    const archivedChats = userChats.filter((chat) => chat.archived);
-
-    return archivedChats;
-  },
-});
-
 export const getChatById = query({
   args: { _id: v.id("chats") },
   handler: async (ctx, args) => {
@@ -148,6 +122,7 @@ export const updateChatById = mutation({
   },
 });
 
+// NOTE: Refactored
 export const pinnedChats = query({
   args: {},
   handler: async (ctx, args) => {
@@ -325,3 +300,4 @@ export const deleteChat = mutation({
     return await ctx.db.delete(args.chatId);
   },
 });
+// NOTE: Refactored
