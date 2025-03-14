@@ -4,9 +4,9 @@ import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
 import dayjs from "dayjs";
 
-import ReplyTo from "./reply-to";
 import MessageOptions from "./message-options";
 import Media from "./media";
+import ReplyTo from "./reply-to";
 
 import { Doc } from "@/convex/_generated/dataModel";
 
@@ -15,30 +15,30 @@ export default function Message({
   currentUser,
   index,
 }: {
-  msg: Doc<"messages">;
+  msg: Doc<"chat_messages">;
   currentUser: Doc<"users">;
   index: number;
 }) {
   return (
     <div
       className={`group flex gap-1 ${
-        msg.sender === currentUser?._id ? "justify-end" : "justify-start"
+        msg.senderId === currentUser?._id ? "justify-end" : "justify-start"
       }`}
     >
       {/* Message */}
       <div
         className={`relative w-fit max-w-xs rounded-md lg:max-w-lg xl:max-w-xl ${
-          msg.sender === currentUser?._id
-            ? "order-2 bg-default"
-            : "order-1 bg-black text-white dark:bg-white dark:text-black"
+          msg.senderId === currentUser?._id
+            ? "order-2 bg-black text-white dark:bg-white dark:text-black"
+            : "order-1 bg-default"
         }`}
       >
         <div className="space-y-2 p-2">
           {/* Reply to */}
-          {msg.replyTo && !msg.unsentBy && <ReplyTo msg={msg} />}
+          {msg.replyTo && !msg.isUnsent && <ReplyTo msg={msg} />}
 
-          {/* TODO: Media */}
-          {msg.mediaUrl && !msg.unsentBy && <Media msg={msg} />}
+          {/* Media */}
+          {msg.mediaId && !msg.isUnsent && <Media msg={msg} />}
 
           {/* Text content */}
           <div className="flex gap-2">
@@ -50,9 +50,9 @@ export default function Message({
             {/* NOTE: Kalau pakai markdown, gabisa multiple line breaks */}
             <div
               className={`prose text-sm ${
-                msg.sender === currentUser?._id
-                  ? "text-black marker:text-black dark:text-white dark:marker:text-white"
-                  : "text-white marker:text-white dark:text-black dark:marker:text-black"
+                msg.senderId === currentUser?._id
+                  ? "text-white marker:text-white dark:text-black dark:marker:text-black"
+                  : "text-black marker:text-black dark:text-white dark:marker:text-white"
               }`}
               style={{
                 wordBreak: "break-word",
@@ -65,9 +65,9 @@ export default function Message({
                     <a
                       {...props}
                       className={`${
-                        msg.sender === currentUser?._id
-                          ? "text-black dark:text-white"
-                          : "text-white dark:text-black"
+                        msg.senderId === currentUser?._id
+                          ? "text-white dark:text-black"
+                          : "text-black dark:text-white"
                       }`}
                       rel="noopener noreferrer"
                       target="_blank"
@@ -80,9 +80,9 @@ export default function Message({
                     <blockquote
                       {...props}
                       className={`${
-                        msg.sender === currentUser?._id
-                          ? "text-black dark:text-white"
-                          : "text-white dark:text-black"
+                        msg.senderId === currentUser?._id
+                          ? "text-white dark:text-black"
+                          : "text-black dark:text-white"
                       }`}
                     >
                       {props.children}
@@ -97,7 +97,7 @@ export default function Message({
                 }}
                 remarkPlugins={[remarkGfm, remarkBreaks]}
               >
-                {msg.unsentBy ? `_message was unsent_` : msg.content}
+                {msg.isUnsent ? `_message was unsent_` : msg.text}
               </ReactMarkdown>
             </div>
 
@@ -121,9 +121,10 @@ export default function Message({
       {/* CTA */}
       <div
         className={`pointer-events-none flex items-end opacity-0 transition-all group-hover:pointer-events-auto group-hover:opacity-100 ${
-          msg.sender === currentUser?._id ? "order-1" : "order-2"
+          msg.senderId === currentUser?._id ? "order-1" : "order-2"
         }`}
       >
+        {/* Message options */}
         <MessageOptions index={index} msg={msg} />
       </div>
     </div>

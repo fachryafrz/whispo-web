@@ -9,7 +9,7 @@ import { SendHorizontal } from "lucide-react";
 import { Textarea } from "@heroui/input";
 import { Button } from "@heroui/button";
 import { useRef } from "react";
-import { useMutation, useQuery } from "convex/react";
+import { useMutation } from "convex/react";
 
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { handleKeyDown } from "@/utils/handle-textarea-key-down";
@@ -22,7 +22,7 @@ export default function EditMessageModal({
   isOpen,
   onOpenChange,
 }: {
-  msg: Doc<"messages">;
+  msg: Doc<"chat_messages">;
   message: string | null;
   setMessage: (message: string) => void;
   isOpen: boolean;
@@ -30,8 +30,7 @@ export default function EditMessageModal({
 }) {
   const formRef = useRef<HTMLFormElement>(null);
 
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const editMessage = useMutation(api.messages.editMessage);
+  const editMessage = useMutation(api.chats.editMessage);
 
   return (
     <Modal
@@ -54,9 +53,9 @@ export default function EditMessageModal({
                   e.preventDefault();
 
                   editMessage({
-                    _id: msg._id as Id<"messages">,
-                    content: message as string,
-                    editedBy: currentUser?._id as Id<"users">,
+                    messageId: msg._id as Id<"chat_messages">,
+                    chatId: msg.chatId as Id<"chats">,
+                    text: message as string,
                   });
 
                   onClose();

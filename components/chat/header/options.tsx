@@ -16,19 +16,19 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Id } from "@/convex/_generated/dataModel";
+import { useSelectedChat } from "@/zustand/selected-chat";
 
 export default function Options() {
-  const { activeChat, clearActiveChat } = useChat();
+  const { selectedChat, clearSelectedChat } = useSelectedChat();
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
 
-  const deleteChat = useMutation(api.chats.deleteChat);
+  const clearChat = useMutation(api.chats.clearChat);
 
-  const handleDelete = () => {
-    deleteChat({ _id: activeChat?._id as Id<"chats"> });
-    clearActiveChat();
+  const handleClear = () => {
+    clearChat({ chatId: selectedChat?.chatId as Id<"chats"> });
+    clearSelectedChat();
   };
 
   return (
@@ -43,7 +43,7 @@ export default function Options() {
             onClick={onOpen}
           >
             <Trash2 size={20} />
-            <div>Delete chat</div>
+            <div>Clear chat</div>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -80,15 +80,15 @@ export default function Options() {
           {(onClose) => (
             <>
               <ModalHeader className="flex flex-col gap-1">
-                <h3 className="text-2xl font-bold">Delete chat</h3>
+                <h3 className="text-2xl font-bold">Clear chat</h3>
               </ModalHeader>
               <ModalBody>
                 <p>
-                  Are you sure you want to delete this chat? This action is
+                  Are you sure you want to clear this chat? This action is
                   irreversible.
                 </p>
                 <p>
-                  This will permanently delete the chat for you and the other
+                  This will permanently clear the chat for you and the other
                   participant.
                 </p>
               </ModalBody>
@@ -96,8 +96,8 @@ export default function Options() {
                 <Button color="default" variant="light" onPress={onClose}>
                   Close
                 </Button>
-                <Button color="danger" onPress={handleDelete}>
-                  Yes, delete
+                <Button color="danger" onPress={handleClear}>
+                  Yes, clear
                 </Button>
               </ModalFooter>
             </>

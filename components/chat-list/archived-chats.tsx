@@ -1,44 +1,18 @@
-import { usePaginatedQuery, useQuery } from "convex/react";
+import { useQuery } from "convex/react";
 import { Button } from "@heroui/button";
 import { ArrowLeft } from "lucide-react";
-import { Spinner } from "@heroui/spinner";
-import { useInView } from "react-intersection-observer";
-import { useEffect } from "react";
 
 import { ChatListCard } from "./list-card";
 
 import { api } from "@/convex/_generated/api";
-import { useChat } from "@/zustand/chat";
 import { useArchivedChats } from "@/zustand/archived-chats";
-
-const NUM_CHATS_TO_LOAD = 20;
 
 export default function ArchivedChats() {
   // Zustand
   const { open, setOpen } = useArchivedChats();
-  const { activeChat, setActiveChat } = useChat();
-  const { ref: loadMoreRef, inView } = useInView();
 
   // Convex
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const {
-    results: allChats,
-    status,
-    loadMore,
-  } = usePaginatedQuery(
-    api.chats.getAllChats,
-    {},
-    { initialNumItems: NUM_CHATS_TO_LOAD },
-  );
-
-  const userChats = allChats.filter((chat) =>
-    chat.participants.some((participant) => participant === currentUser?._id),
-  );
-  const chats = userChats.filter((chat) => chat.archived);
-
-  useEffect(() => {
-    if (inView) loadMore(NUM_CHATS_TO_LOAD);
-  }, [inView]);
+  const archivedChats = useQuery(api.chats.archivedChats);
 
   return (
     <div
@@ -61,32 +35,26 @@ export default function ArchivedChats() {
         </h2>
       </div>
 
-      {/* No results */}
-      {chats?.length === 0 && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-4 text-center text-default-500">
-          <p className="text-sm">No archived chats</p>
-        </div>
-      )}
-
       {/* Results */}
-      {chats?.length! > 0 && (
-        <ul>
-          {chats
-            ?.sort((a, b) => b.lastMessageTime! - a.lastMessageTime!)
-            .map((chat) => (
-              <li key={chat._id}>
-                <ChatListCard chat={chat} />
-              </li>
-            ))}
+      <ul className={`h-full overflow-y-auto`}>
+        {/* No results */}
+        {(archivedChats?.length === 0 ||
+          archivedChats?.every((chat) => !chat?.lastMessage)) && (
+          <li className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-default-500">
+            <p className="text-sm">No archived chats</p>
+          </li>
+        )}
 
-          {/* Load more */}
-          {status === "CanLoadMore" && (
-            <li ref={loadMoreRef} className="flex w-full justify-center py-2">
-              <Spinner />
+        {/* Chats */}
+        {archivedChats
+          ?.filter((chat) => chat!.lastMessage)
+          .sort((a, b) => b!.lastMessageTime! - a!.lastMessageTime!)
+          .map((chat) => (
+            <li key={chat!._id}>
+              <ChatListCard archived chat={chat!} />
             </li>
-          )}
-        </ul>
-      )}
+          ))}
+      </ul>
     </div>
   );
 }

@@ -1,22 +1,22 @@
-import { usePaginatedQuery, useQuery } from "convex/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@heroui/button";
 import { ArrowDown } from "lucide-react";
+import { usePaginatedQuery, useQuery } from "convex/react";
 import { Spinner } from "@heroui/spinner";
 import { useInView } from "react-intersection-observer";
 import { useTheme } from "next-themes";
 
 import Message from "../message";
 
-import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
+import { useSelectedChat } from "@/zustand/selected-chat";
 
 const NUM_MESSAGES_TO_LOAD = 50;
 
 export default function ChatMessages() {
   const { resolvedTheme } = useTheme();
-  const { activeChat } = useChat();
+  const { selectedChat } = useSelectedChat();
   const { ref: loadMoreRef, inView } = useInView();
 
   const currentUser = useQuery(api.users.getCurrentUser);
@@ -26,8 +26,8 @@ export default function ChatMessages() {
     status,
     loadMore,
   } = usePaginatedQuery(
-    api.messages.getMessagesByChatId,
-    { chatId: activeChat?._id as Id<"chats"> },
+    api.chats.getMessages,
+    { chatId: selectedChat?.chatId as Id<"chats"> },
     { initialNumItems: NUM_MESSAGES_TO_LOAD },
   );
 
@@ -53,7 +53,7 @@ export default function ChatMessages() {
         {/* Scroll to bottom */}
         <Button
           isIconOnly
-          className={`fixed z-10 bg-black text-white transition-all dark:bg-white dark:text-black ${showScrollBtn ? "opacity-100" : "opacity-0"}`}
+          className={`fixed z-10 bg-black text-white transition-all dark:bg-white dark:text-black ${showScrollBtn ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"}`}
           radius="full"
           onPress={() => {
             containerRef.current?.scrollTo({
@@ -65,36 +65,32 @@ export default function ChatMessages() {
           <ArrowDown size={20} />
         </Button>
 
-        {messages
-          ?.filter(
-            (msg) => !msg.deletedBy?.includes(currentUser?._id as Id<"users">),
-          )
-          .map((msg, index) => {
-            const prevMsg = messages[index + 1];
-            const isDifferentSender = prevMsg?.sender !== msg.sender;
+        {messages.map((msg, index) => {
+          const prevMsg = messages[index + 1];
+          const isDifferentSender = prevMsg?.senderId !== msg.senderId;
 
-            return (
-              <div
-                key={msg._id}
-                className={`w-full ${isDifferentSender ? "pt-4" : "pt-0"}`}
-              >
-                <Message
-                  currentUser={currentUser as Doc<"users">}
-                  index={index}
-                  msg={msg}
-                />
+          return (
+            <div
+              key={msg._id}
+              className={`w-full ${prevMsg?.senderId} ${isDifferentSender ? "pt-4" : "pt-0"}`}
+            >
+              <Message
+                currentUser={currentUser as Doc<"users">}
+                index={index}
+                msg={msg}
+              />
 
-                {/* Edited */}
-                {msg.editedBy && (
-                  <span
-                    className={`flex text-xs ${msg.sender === currentUser?._id ? "justify-end" : "justify-start"}`}
-                  >
-                    Edited
-                  </span>
-                )}
-              </div>
-            );
-          })}
+              {/* Edited */}
+              {msg.isEdited && (
+                <span
+                  className={`flex text-xs ${msg.senderId === currentUser?._id ? "justify-end" : "justify-start"}`}
+                >
+                  Edited
+                </span>
+              )}
+            </div>
+          );
+        })}
 
         {/* Paginate messages */}
         {status === "CanLoadMore" && (

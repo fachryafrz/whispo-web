@@ -10,48 +10,74 @@ export default defineSchema({
     avatarUrl: v.string(),
   })
     .index("by_token", ["tokenIdentifier"])
-    .searchIndex("search_username", {
-      searchField: "username",
-    }),
+    .searchIndex("search_username", { searchField: "username" }),
 
   chats: defineTable({
     type: v.string(), // "private" or "group"
-    participants: v.array(v.id("users")),
     name: v.optional(v.string()), // For group chats
     description: v.optional(v.string()), // For group chats
     imageUrl: v.optional(v.string()), // For group chats
     lastMessage: v.optional(v.string()),
     lastMessageSender: v.optional(v.string()),
     lastMessageTime: v.optional(v.number()),
-    pinned: v.optional(v.boolean()),
-    // unreadCount: v.optional(v.number()),
-    seenBy: v.optional(v.array(v.id("users"))),
-    archived: v.optional(v.boolean()),
-  })
-    .index("by_type", ["type"])
-    .index("by_participants_and_type", ["participants", "type"]),
+    hasMedia: v.optional(v.boolean()),
+  }).index("by_type", ["type"]),
 
-  messages: defineTable({
-    chat: v.id("chats"),
-    sender: v.id("users"),
-    content: v.string(),
-    mediaUrl: v.optional(v.id("_storage")),
-    readBy: v.optional(v.array(v.id("users"))),
-    editedBy: v.optional(v.id("users")),
-    replyTo: v.optional(v.id("messages")),
-    deletedBy: v.optional(v.array(v.id("users"))),
-    deletedAt: v.optional(v.array(v.number())),
-    unsentBy: v.optional(v.id("users")),
-    unsentAt: v.optional(v.number()),
-  }).index("by_chat", ["chat"]),
+  chat_participants: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["chatId"])
+    .index("by_user_chat", ["userId", "chatId"]),
+
+  chat_messages: defineTable({
+    chatId: v.id("chats"),
+    senderId: v.id("users"),
+    text: v.string(),
+    mediaId: v.optional(v.id("_storage")),
+    replyTo: v.optional(v.id("chat_messages")),
+    isEdited: v.optional(v.boolean()),
+    isUnsent: v.optional(v.boolean()),
+  }).index("by_chat", ["chatId"]),
+
+  // TODO: add deleted_messages table
+  deleted_messages: defineTable({
+    chatId: v.id("chats"),
+    messageId: v.id("chat_messages"),
+    userId: v.id("users"),
+  })
+    .index("by_chat", ["chatId"])
+    .index("by_message", ["messageId"])
+    .index("by_user", ["userId"]),
+
+  pinned_chats: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["chatId"])
+    .index("by_user_chat", ["userId", "chatId"]),
+
+  archived_chats: defineTable({
+    chatId: v.id("chats"),
+    userId: v.id("users"),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["chatId"])
+    .index("by_user_chat", ["userId", "chatId"]),
 
   unread_messages: defineTable({
-    user: v.id("users"), // User that has unread messages
-    chat: v.id("chats"), // Related chat
+    userId: v.id("users"), // User that has unread messages
+    chatId: v.id("chats"), // Related chat
     count: v.number(), // Unread message count
-  }).index("by_user_chat", ["user", "chat"]),
+  })
+    .index("by_user", ["userId"])
+    .index("by_chat", ["chatId"])
+    .index("by_user_chat", ["userId", "chatId"]),
 
   friendships: defineTable({
+    // TODO: friendships
     user1: v.id("users"),
     user2: v.id("users"),
     status: v.string(),

@@ -7,34 +7,29 @@ export const getCurrentUser = query({
   handler: async (ctx) => {
     const identity = await ctx.auth.getUserIdentity();
 
-    if (!identity) {
-      // throw new Error("Not authenticated");
-      return;
-    }
+    if (!identity) return;
 
     const user = await ctx.db
       .query("users")
       .withIndex("by_token", (q) =>
         q.eq("tokenIdentifier", identity.tokenIdentifier),
       )
-      .first();
+      .unique();
 
-    if (!user) {
-      // throw new Error("User not found");
-      return;
-    }
+    if (!user) return;
 
     return user;
   },
 });
 
-export const getUserById = query({
-  args: { _id: v.id("users") },
+export const getUser = query({
+  args: {
+    userId: v.optional(v.id("users")),
+  },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("users")
-      .withIndex("by_id", (q) => q.eq("_id", args._id))
-      .first();
+    if (!args.userId) return;
+    
+    return await ctx.db.get(args.userId);
   },
 });
 
