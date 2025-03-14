@@ -44,16 +44,16 @@ Whispo is a fast, secure, and intuitive real-time chat application designed to e
 - 🔎 Search users by username
 - ✉️ Chat
   - 📜 View chat history
-  - 🗑️ Delete chats
-  - 📂 Archive chats
   - 📌 Pin chats
+  - 📂 Archive chats
   - 👥 Group chats (coming soon)
-  - 🔔 Unread count (coming soon)
+  - 🔔 Unread count
+  - 🗑️ Clear chats
 - 💬 Message
   - 💬 Send messages
   - ↩️ Reply to messages
   - 📝 Edit messages
   - ❌ Unsend messages
-  - 🗑️ Delete messages
+  - 🗑️ Delete messages (coming soon)
   - 🖼️ Message with media
   - 📑 Auto load messages
