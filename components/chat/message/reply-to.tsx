@@ -4,7 +4,6 @@ import ReactMarkdown from "react-markdown";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 
-// TODO: Condition replying to deleted message
 export default function ReplyTo({ msg }: { msg: Doc<"chat_messages"> }) {
   const getMessage = useQuery(api.chats.getMessage, {
     messageId: msg.replyTo as Id<"chat_messages">,

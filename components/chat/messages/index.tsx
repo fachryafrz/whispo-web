@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@heroui/button";
 import { ArrowDown } from "lucide-react";
-import { usePaginatedQuery, useQuery } from "convex/react";
+import {
+  PaginatedQueryReference,
+  usePaginatedQuery,
+  useQuery,
+} from "convex/react";
 import { Spinner } from "@heroui/spinner";
 import { useInView } from "react-intersection-observer";
 import { useTheme } from "next-themes";
@@ -26,7 +30,7 @@ export default function ChatMessages() {
     status,
     loadMore,
   } = usePaginatedQuery(
-    api.chats.getMessages,
+    api.chats.getMessages as PaginatedQueryReference, // NOTE: Potential bug when filtering out deleted messages
     { chatId: selectedChat?.chatId as Id<"chats"> },
     { initialNumItems: NUM_MESSAGES_TO_LOAD },
   );

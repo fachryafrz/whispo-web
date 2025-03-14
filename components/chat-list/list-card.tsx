@@ -36,7 +36,7 @@ export function ChatListCard({
   const unreadMessages = useQuery(api.chats.getUnreadMessages, {
     chatId: chat._id as Id<"chats">,
   });
-  const deleteUnreadMessage = useMutation(api.chats.deleteUnreadMessage);
+  const readMessage = useMutation(api.chats.readMessage);
 
   const interlocutor = getChatParticipants?.find(
     (p) => p?._id !== currentUser?._id,
@@ -51,7 +51,7 @@ export function ChatListCard({
       imageUrl: interlocutor?.avatarUrl,
     });
 
-    deleteUnreadMessage({
+    readMessage({
       chatId: chat._id as Id<"chats">,
       userId: currentUser?._id as Id<"users">,
     });

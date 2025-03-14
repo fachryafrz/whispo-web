@@ -330,6 +330,11 @@ export const clearChat = mutation({
       .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
       .collect();
 
+    const deletedMessages = await ctx.db
+      .query("deleted_messages")
+      .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
+      .collect();
+
     // Delete messages
     for (const message of messages) {
       // Delete media
@@ -361,6 +366,11 @@ export const clearChat = mutation({
       await ctx.db.delete(participant._id);
     }
 
+    // Remove deleted messages
+    for (const deletedMessage of deletedMessages) {
+      await ctx.db.delete(deletedMessage._id);
+    }
+
     // Update last message to undefined
     // await ctx.db.patch(args.chatId, {
     //   lastMessage: undefined,
@@ -372,18 +382,47 @@ export const clearChat = mutation({
   },
 });
 
-// Messages // TODO: Filter deleted messages
+// Messages
 export const getMessages = query({
   args: {
     chatId: v.id("chats"),
     paginationOpts: paginationOptsValidator,
   },
   handler: async (ctx, args) => {
-    return await ctx.db
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) return [];
+
+    const deletedMessages = await ctx.db
+      .query("deleted_messages")
+      .withIndex("by_user_chat", (q) =>
+        q.eq("userId", user._id).eq("chatId", args.chatId),
+      )
+      .collect();
+
+    const deletedMessagesIds = deletedMessages.map(
+      (message) => message.messageId,
+    );
+
+    const results = await ctx.db
       .query("chat_messages")
       .withIndex("by_chat", (q) => q.eq("chatId", args.chatId))
       .order("desc")
       .paginate(args.paginationOpts);
+
+    return {
+      ...results,
+      page: results.page.filter((msg) => !deletedMessagesIds.includes(msg._id)), // Filter deleted messages
+    };
   },
 });
 
@@ -555,10 +594,32 @@ export const unsendMessage = mutation({
     });
   },
 });
-// TODO: delete message
+
 export const deleteMessage = mutation({
-  args: {},
-  handler: async (ctx, args) => {},
+  args: {
+    chatId: v.id("chats"),
+    messageId: v.id("chat_messages"),
+  },
+  handler: async (ctx, args) => {
+    const identity = await ctx.auth.getUserIdentity();
+
+    if (!identity) return;
+
+    const user = await ctx.db
+      .query("users")
+      .withIndex("by_token", (q) =>
+        q.eq("tokenIdentifier", identity.tokenIdentifier),
+      )
+      .unique();
+
+    if (!user) return;
+
+    return await ctx.db.insert("deleted_messages", {
+      chatId: args.chatId,
+      messageId: args.messageId,
+      userId: user._id,
+    });
+  },
 });
 
 // Message media
@@ -631,7 +692,8 @@ export const addUnreadMessage = mutation({
   },
 });
 
-export const deleteUnreadMessage = mutation({
+// NOTE: Mark message as read by deleting unread message
+export const readMessage = mutation({
   args: {
     userId: v.id("users"),
     chatId: v.id("chats"),

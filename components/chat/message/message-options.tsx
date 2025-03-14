@@ -2,7 +2,6 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { EllipsisVertical, Pencil, Reply, Trash2, Undo2 } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
-import { addToast } from "@heroui/toast";
 
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
@@ -30,7 +29,8 @@ export default function MessageOptions({
   const currentUser = useQuery(api.users.getCurrentUser);
 
   const unsendMessage = useMutation(api.chats.unsendMessage);
-  const deleteUnreadMessage = useMutation(api.chats.deleteUnreadMessage);
+  const readMessage = useMutation(api.chats.readMessage);
+  const deleteMessage = useMutation(api.chats.deleteMessage);
 
   const [windowWidth, setWindowWidth] = useState(0);
 
@@ -57,7 +57,7 @@ export default function MessageOptions({
             onClick={() => {
               setReplyMessageId(msg._id);
 
-              deleteUnreadMessage({
+              readMessage({
                 userId: currentUser?._id as Id<"users">,
                 chatId: msg.chatId as Id<"chats">,
               });
@@ -101,48 +101,27 @@ export default function MessageOptions({
                   </DropdownMenuItem>
                 </>
               )}
-
-              {/* If message was unsent */}
-              {msg.isUnsent && (
-                <>
-                  {/* TODO: Delete */}
-                  <DropdownMenuItem
-                    className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
-                    onClick={() => {
-                      addToast({
-                        title: "Delete for me",
-                        description: "Feature not implemented yet",
-                        color: "warning",
-                      });
-
-                      // deleteMessage({
-                      //   messageId: msg._id as Id<"chat_messages">,
-                      //   deletedBy: msg.deletedBy
-                      //     ? [...msg.deletedBy, currentUser?._id as Id<"users">]
-                      //     : [currentUser?._id as Id<"users">],
-                      //   deletedAt: msg.deletedAt
-                      //     ? [...msg.deletedAt, Date.now()]
-                      //     : [Date.now()],
-                      // });
-
-                      // TODO: update last message to previous message
-                      // if (index === 0) {
-                      //   updateChat({
-                      //     _id: activeChat?._id as Id<"chats">,
-                      //     lastMessage: "_message was unsent_",
-                      //     lastMessageSender: currentUser?._id as Id<"users">,
-                      //     lastMessageTime: Date.now(),
-                      //   });
-                      // }
-                    }}
-                  >
-                    <Trash2 size={20} />
-                    <div>Delete for me</div>
-                  </DropdownMenuItem>
-                </>
-              )}
             </>
           ) : null}
+
+          {/* If message was unsent */}
+          {msg.isUnsent && (
+            <>
+              {/* Delete */}
+              <DropdownMenuItem
+                className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
+                onClick={() => {
+                  deleteMessage({
+                    chatId: msg.chatId as Id<"chats">,
+                    messageId: msg._id as Id<"chat_messages">,
+                  });
+                }}
+              >
+                <Trash2 size={20} />
+                <div>Delete for me</div>
+              </DropdownMenuItem>
+            </>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
 
@@ -243,16 +222,6 @@ export default function MessageOptions({
                     ? [...msg.deletedAt, Date.now()]
                     : [Date.now()],
                 });
-  
-                // TODO: update last message to previous message
-                // if (index === 0) {
-                //   updateChat({
-                //     _id: activeChat?._id as Id<"chats">,
-                //     lastMessage: "_message was unsent_",
-                //     lastMessageSender: currentUser?._id as Id<"users">,
-                //     lastMessageTime: Date.now(),
-                //   });
-                // }
               }}
             >
               Delete for me

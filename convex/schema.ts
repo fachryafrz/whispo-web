@@ -41,7 +41,6 @@ export default defineSchema({
     isUnsent: v.optional(v.boolean()),
   }).index("by_chat", ["chatId"]),
 
-  // TODO: add deleted_messages table
   deleted_messages: defineTable({
     chatId: v.id("chats"),
     messageId: v.id("chat_messages"),
@@ -49,7 +48,8 @@ export default defineSchema({
   })
     .index("by_chat", ["chatId"])
     .index("by_message", ["messageId"])
-    .index("by_user", ["userId"]),
+    .index("by_user", ["userId"])
+    .index("by_user_chat", ["userId", "chatId"]),
 
   pinned_chats: defineTable({
     chatId: v.id("chats"),
