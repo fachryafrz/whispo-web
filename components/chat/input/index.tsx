@@ -16,7 +16,6 @@ import { useSelectedChat } from "@/zustand/selected-chat";
 
 export default function ChatInput() {
   // Zustand
-  // const { activeChat } = useChat();
   const { selectedChat } = useSelectedChat();
   const { replyMessageId, clearReplyTo } = useReplyMessage();
 
@@ -111,6 +110,7 @@ export default function ChatInput() {
 
             <button
               className="absolute right-1 top-1"
+              disabled={isLoading}
               onClick={() => {
                 setSelectedImage(null);
                 imageInput.current!.value = "";

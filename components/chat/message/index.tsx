@@ -14,10 +14,14 @@ export default function Message({
   msg,
   currentUser,
   index,
+  isDifferentSenderNext,
+  isDifferentSenderPrev,
 }: {
   msg: Doc<"chat_messages">;
   currentUser: Doc<"users">;
   index: number;
+  isDifferentSenderPrev?: boolean;
+  isDifferentSenderNext?: boolean;
 }) {
   return (
     <div
@@ -27,10 +31,22 @@ export default function Message({
     >
       {/* Message */}
       <div
-        className={`relative w-fit max-w-xs rounded-md lg:max-w-lg xl:max-w-xl ${
+        className={`relative w-fit max-w-xs rounded-xl lg:max-w-lg xl:max-w-xl ${
           msg.senderId === currentUser?._id
-            ? "order-2 bg-black text-white dark:bg-white dark:text-black"
-            : "order-1 bg-default"
+            ? `order-2 bg-black text-white dark:bg-white dark:text-black ${
+                isDifferentSenderPrev
+                  ? "rounded-br-none"
+                  : isDifferentSenderNext
+                    ? "rounded-tr-none"
+                    : "rounded-r-none"
+              }`
+            : `order-1 bg-default ${
+                isDifferentSenderPrev
+                  ? "rounded-bl-none"
+                  : isDifferentSenderNext
+                    ? "rounded-tl-none"
+                    : "rounded-l-none"
+              }`
         }`}
       >
         <div className="space-y-2 p-2">

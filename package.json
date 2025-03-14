@@ -82,6 +82,7 @@
   "remark-gfm": "^4.0.1",
   "tailwind-merge": "^3.0.2",
   "tailwindcss-animate": "^1.0.7",
+  "yet-another-react-lightbox": "^3.21.8",
   "zustand": "^5.0.3"
  },
  "devDependencies": {
