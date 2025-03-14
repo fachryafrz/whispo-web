@@ -71,16 +71,20 @@ export default function ChatMessages() {
 
         {messages.map((msg, index) => {
           const prevMsg = messages[index + 1];
-          const isDifferentSender = prevMsg?.senderId !== msg.senderId;
+          const nextmsg = messages[index - 1];
+          const isDifferentSenderPrev = prevMsg?.senderId !== msg.senderId;
+          const isDifferentSenderNext = nextmsg?.senderId !== msg.senderId;
 
           return (
             <div
               key={msg._id}
-              className={`w-full ${prevMsg?.senderId} ${isDifferentSender ? "pt-4" : "pt-0"}`}
+              className={`w-full ${prevMsg?.senderId} ${isDifferentSenderPrev ? "pt-4" : "pt-0"}`}
             >
               <Message
                 currentUser={currentUser as Doc<"users">}
                 index={index}
+                isDifferentSenderNext={isDifferentSenderNext}
+                isDifferentSenderPrev={isDifferentSenderPrev}
                 msg={msg}
               />
 

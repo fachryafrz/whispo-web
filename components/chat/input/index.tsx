@@ -16,7 +16,6 @@ import { useSelectedChat } from "@/zustand/selected-chat";
 
 export default function ChatInput() {
   // Zustand
-  // const { activeChat } = useChat();
   const { selectedChat } = useSelectedChat();
   const { replyMessageId, clearReplyTo } = useReplyMessage();
 

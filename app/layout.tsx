@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import ChatList from "@/components/chat-list";
+import ImageCarousel from "@/components/modal/image-carousel";
 
 export const metadata: Metadata = {
   title: {
@@ -79,6 +80,8 @@ export default function RootLayout({
 
                 {children}
               </div>
+
+              <ImageCarousel />
             </main>
           </ConvexClientProvider>
         </Providers>
