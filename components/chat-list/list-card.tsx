@@ -11,9 +11,9 @@ import {
 
 import ChatCard from "./card";
 
-import { useChat } from "@/zustand/chat";
 import { api } from "@/convex/_generated/api";
 import { Doc, Id } from "@/convex/_generated/dataModel";
+import { useSelectedChat } from "@/zustand/selected-chat";
 
 export function ChatListCard({
   chat,
@@ -24,32 +24,37 @@ export function ChatListCard({
   pinned?: boolean;
   archived?: boolean;
 }) {
-  const { setActiveChat } = useChat();
+  const { setSelectedChat } = useSelectedChat();
 
   // Convex
   const currentUser = useQuery(api.users.getCurrentUser);
-  const chatById = useQuery(api.chats.getChatById, { _id: chat._id });
-  const storeChat = useMutation(api.chats.store);
+  const getChatParticipants = useQuery(api.chats.getChatParticipants, {
+    chatId: chat._id,
+  });
   const pinChat = useMutation(api.chats.pinChat);
   const archiveChat = useMutation(api.chats.archiveChat);
-  const getUnread = useQuery(api.unread_messages.get, {
-    chat: chat._id as Id<"chats">,
+  const unreadMessages = useQuery(api.chats.getUnreadMessages, {
+    chatId: chat._id as Id<"chats">,
   });
+  const deleteUnreadMessage = useMutation(api.chats.deleteUnreadMessage);
 
-  const interlocutor = chatById?.participants.find(
+  const interlocutor = getChatParticipants?.find(
     (p) => p?._id !== currentUser?._id,
   );
-  const handleSelectChat = () => {
-    const value = {
-      type: chat.type,
-      participants: [
-        interlocutor?._id as Id<"users">,
-        currentUser?._id as Id<"users">,
-      ],
-    };
 
-    storeChat(value);
-    setActiveChat({ _id: chat._id, ...value } as Doc<"chats">);
+  const handleSelectChat = () => {
+    setSelectedChat({
+      chatId: chat?._id as Id<"chats">,
+      type: "private",
+      name: interlocutor?.name,
+      description: interlocutor?.username,
+      imageUrl: interlocutor?.avatarUrl,
+    });
+
+    deleteUnreadMessage({
+      chatId: chat._id as Id<"chats">,
+      userId: currentUser?._id as Id<"users">,
+    });
   };
 
   return (
@@ -59,6 +64,7 @@ export function ChatListCard({
           <ContextMenuTrigger>
             <ChatCard
               description={`${chat.lastMessageSender === currentUser?._id ? "You: " : ""} ${chat.lastMessage}`}
+              hasMedia={chat.hasMedia}
               imageUrl={
                 chat.type === "private"
                   ? (interlocutor?.avatarUrl ?? "")
@@ -71,8 +77,8 @@ export function ChatListCard({
                   ? (interlocutor?.name ?? "")
                   : (chat.name ?? "")
               }
-              unreadCount={getUnread?.count}
-              onPress={() => handleSelectChat()}
+              unreadCount={unreadMessages?.count}
+              onPress={handleSelectChat}
             />
           </ContextMenuTrigger>
           <ContextMenuContent>

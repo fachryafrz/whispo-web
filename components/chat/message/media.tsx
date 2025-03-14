@@ -4,21 +4,19 @@ import { useQuery } from "convex/react";
 import { api } from "@/convex/_generated/api";
 import { Doc } from "@/convex/_generated/dataModel";
 
-export default function Media({ msg }: { msg: Doc<"messages"> }) {
-  const getMessageMedia = useQuery(api.messages.getMessageMedia, {
-    _id: msg.mediaUrl,
-  });
+export default function Media({ msg }: { msg: Doc<"chat_messages"> }) {
+  const getMedia = useQuery(api.chats.getMedia, { mediaId: msg.mediaId });
 
   return (
     <>
-      {getMessageMedia && (
+      {getMedia && (
         <div className="flex items-center gap-2">
           <div className="relative overflow-hidden rounded-md">
             <img
               alt=""
               className="max-h-[500px] object-cover"
               draggable={false}
-              src={getMessageMedia}
+              src={getMedia}
             />
           </div>
         </div>

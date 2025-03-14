@@ -1,7 +1,7 @@
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
 import { Image } from "@heroui/image";
-import { Pin } from "lucide-react";
+import { Pin, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
 
@@ -13,6 +13,7 @@ type ChatCardProps = {
   timeSent?: string;
   unreadCount?: number;
   pinned?: boolean;
+  hasMedia?: boolean;
   onPress: () => void;
 };
 
@@ -24,6 +25,7 @@ export default function ChatCard({
   timeSent,
   unreadCount,
   pinned,
+  hasMedia,
   onPress,
 }: ChatCardProps) {
   const router = useRouter();
@@ -58,13 +60,25 @@ export default function ChatCard({
 
           {/* Text */}
           {description && (
-            <div className="h-5 overflow-hidden" title={description}>
+            <div
+              className="flex h-5 items-center gap-1 overflow-hidden"
+              title={description}
+            >
+              {hasMedia && (
+                <ImageIcon
+                  className={
+                    unreadCount ? "font-bold text-white" : "text-default-500"
+                  }
+                  size={16}
+                />
+              )}
+
               <ReactMarkdown
                 components={{
                   // eslint-disable-next-line @typescript-eslint/no-unused-vars
                   p: ({ node, ...props }) => (
                     <p
-                      className={`overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500 ${unreadCount ? "font-bold text-white" : ""}`}
+                      className={`overflow-hidden text-ellipsis whitespace-nowrap text-small ${unreadCount ? "font-bold text-white" : "text-default-500"}`}
                       {...props}
                     />
                   ),

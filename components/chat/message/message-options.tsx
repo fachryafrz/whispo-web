@@ -2,10 +2,8 @@ import { useMutation, useQuery } from "convex/react";
 import { useEffect, useState } from "react";
 import { EllipsisVertical, Pencil, Reply, Trash2, Undo2 } from "lucide-react";
 import { useDisclosure } from "@heroui/modal";
+import { addToast } from "@heroui/toast";
 
-import EditMessageModal from "../../modal/edit-message";
-
-import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
 import { api } from "@/convex/_generated/api";
 import { useEditMessage } from "@/zustand/edit-message";
@@ -16,24 +14,23 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import EditMessageModal from "@/components/modal/edit-message";
 
 export default function MessageOptions({
   msg,
   index,
 }: {
-  msg: Doc<"messages">;
+  msg: Doc<"chat_messages">;
   index: number;
 }) {
   const { isOpen, onOpen, onOpenChange } = useDisclosure();
-  const { activeChat } = useChat();
   const { message, setMessage } = useEditMessage();
   const { setReplyMessageId } = useReplyMessage();
 
   const currentUser = useQuery(api.users.getCurrentUser);
 
-  const updateChat = useMutation(api.chats.updateChatById);
-  const unsendMessage = useMutation(api.messages.unsendMessage);
-  const deleteMessage = useMutation(api.messages.deleteMessage);
+  const unsendMessage = useMutation(api.chats.unsendMessage);
+  const deleteUnreadMessage = useMutation(api.chats.deleteUnreadMessage);
 
   const [windowWidth, setWindowWidth] = useState(0);
 
@@ -59,6 +56,11 @@ export default function MessageOptions({
             className="cursor-pointer"
             onClick={() => {
               setReplyMessageId(msg._id);
+
+              deleteUnreadMessage({
+                userId: currentUser?._id as Id<"users">,
+                chatId: msg.chatId as Id<"chats">,
+              });
             }}
           >
             <Reply size={20} />
@@ -66,16 +68,16 @@ export default function MessageOptions({
           </DropdownMenuItem>
 
           {/* Options for message by current user */}
-          {msg.sender === currentUser?._id ? (
+          {msg.senderId === currentUser?._id ? (
             <>
               {/* If message is not unsent */}
-              {!msg.unsentBy && (
+              {!msg.isUnsent && (
                 <>
                   {/* Edit */}
                   <DropdownMenuItem
                     className="cursor-pointer"
                     onClick={() => {
-                      setMessage(msg.content);
+                      setMessage(msg.text);
                       onOpen();
                     }}
                   >
@@ -88,19 +90,10 @@ export default function MessageOptions({
                     className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
                     onClick={() => {
                       unsendMessage({
-                        _id: msg._id as Id<"messages">,
-                        unsentBy: currentUser?._id as Id<"users">,
-                        unsentAt: Date.now(),
+                        messageId: msg._id as Id<"chat_messages">,
+                        chatId: msg.chatId as Id<"chats">,
+                        index: index,
                       });
-
-                      if (index === 0) {
-                        updateChat({
-                          _id: activeChat?._id as Id<"chats">,
-                          lastMessage: "_message was unsent_",
-                          lastMessageSender: currentUser?._id as Id<"users">,
-                          lastMessageTime: Date.now(),
-                        });
-                      }
                     }}
                   >
                     <Undo2 size={20} />
@@ -110,21 +103,27 @@ export default function MessageOptions({
               )}
 
               {/* If message was unsent */}
-              {msg.unsentBy && (
+              {msg.isUnsent && (
                 <>
-                  {/* Delete */}
+                  {/* TODO: Delete */}
                   <DropdownMenuItem
                     className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
                     onClick={() => {
-                      deleteMessage({
-                        _id: msg._id as Id<"messages">,
-                        deletedBy: msg.deletedBy
-                          ? [...msg.deletedBy, currentUser?._id as Id<"users">]
-                          : [currentUser?._id as Id<"users">],
-                        deletedAt: msg.deletedAt
-                          ? [...msg.deletedAt, Date.now()]
-                          : [Date.now()],
+                      addToast({
+                        title: "Delete for me",
+                        description: "Feature not implemented yet",
+                        color: "warning",
                       });
+
+                      // deleteMessage({
+                      //   messageId: msg._id as Id<"chat_messages">,
+                      //   deletedBy: msg.deletedBy
+                      //     ? [...msg.deletedBy, currentUser?._id as Id<"users">]
+                      //     : [currentUser?._id as Id<"users">],
+                      //   deletedAt: msg.deletedAt
+                      //     ? [...msg.deletedAt, Date.now()]
+                      //     : [Date.now()],
+                      // });
 
                       // TODO: update last message to previous message
                       // if (index === 0) {

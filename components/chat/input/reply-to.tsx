@@ -10,13 +10,16 @@ import { useReplyMessage } from "@/zustand/reply-message";
 export default function ReplyTo() {
   const { replyMessageId, clearReplyTo } = useReplyMessage();
 
-  const getMessage = useQuery(api.messages.getMessageById, {
-    _id: replyMessageId as Id<"messages">,
+  const getMessage = useQuery(api.chats.getMessage, {
+    messageId: replyMessageId as Id<"chat_messages">,
+  });
+  const getUser = useQuery(api.users.getUser, {
+    userId: getMessage?.senderId as Id<"users">,
   });
 
   return (
     <>
-      {getMessage && (
+      {getMessage && getUser && (
         <div className="flex items-center gap-2">
           {/* Reply Icon */}
           <div className="grid h-10 w-10 place-content-center">
@@ -27,7 +30,7 @@ export default function ReplyTo() {
           <div className="pointer-events-none flex-1 space-y-1 rounded-md bg-default p-2 text-xs">
             {/* Title */}
             <span className="block font-semibold">
-              Reply to {getMessage?.sender?.username}
+              Reply to {getUser.username}
             </span>
 
             {/* Content */}
@@ -44,9 +47,9 @@ export default function ReplyTo() {
                   ),
                 }}
               >
-                {getMessage.unsentBy
+                {getMessage.isUnsent
                   ? `_message was unsent_`
-                  : getMessage?.content}
+                  : getMessage?.text}
               </ReactMarkdown>
             </div>
           </div>

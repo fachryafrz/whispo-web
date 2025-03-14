@@ -2,9 +2,9 @@ import { v } from "convex/values";
 
 import { mutation, query } from "./_generated/server";
 
-export const get = query({
+export const getUnread = query({
   args: {
-    chat: v.id("chats"),
+    chatId: v.id("chats"),
   },
   handler: async (ctx, args) => {
     const identity = await ctx.auth.getUserIdentity();
@@ -23,23 +23,23 @@ export const get = query({
     return await ctx.db
       .query("unread_messages")
       .withIndex("by_user_chat", (q) =>
-        q.eq("user", user._id).eq("chat", args.chat),
+        q.eq("userId", user._id).eq("chatId", args.chatId),
       )
       .first();
   },
 });
 
-export const store = mutation({
+export const addUnreadMessage = mutation({
   args: {
-    user: v.id("users"),
-    chat: v.id("chats"),
+    userId: v.id("users"),
+    chatId: v.id("chats"),
     count: v.number(),
   },
   handler: async (ctx, args) => {
     const existing = await ctx.db
       .query("unread_messages")
       .withIndex("by_user_chat", (q) =>
-        q.eq("user", args.user).eq("chat", args.chat),
+        q.eq("userId", args.userId).eq("chatId", args.chatId),
       )
       .first();
 
@@ -50,5 +50,24 @@ export const store = mutation({
     }
 
     return await ctx.db.insert("unread_messages", args);
+  },
+});
+
+export const deleteUnreadMessage = mutation({
+  args: {
+    userId: v.id("users"),
+    chatId: v.id("chats"),
+  },
+  handler: async (ctx, args) => {
+    const existing = await ctx.db
+      .query("unread_messages")
+      .withIndex("by_user_chat", (q) =>
+        q.eq("userId", args.userId).eq("chatId", args.chatId),
+      )
+      .first();
+
+    if (existing) {
+      return await ctx.db.delete(existing._id);
+    }
   },
 });

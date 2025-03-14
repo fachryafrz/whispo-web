@@ -1,22 +1,23 @@
 /* eslint-disable @next/next/no-img-element */
 import { Button } from "@heroui/button";
 import { Textarea } from "@heroui/input";
-import { useMutation, useQuery } from "convex/react";
 import { Paperclip, SendHorizontal, X } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { addToast } from "@heroui/toast";
+import { useMutation, useQuery } from "convex/react";
 
 import ReplyTo from "./reply-to";
 
-import { useChat } from "@/zustand/chat";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
 import { handleKeyDown } from "@/utils/handle-textarea-key-down";
 import { useReplyMessage } from "@/zustand/reply-message";
+import { api } from "@/convex/_generated/api";
+import { Id } from "@/convex/_generated/dataModel";
+import { useSelectedChat } from "@/zustand/selected-chat";
 
 export default function ChatInput() {
   // Zustand
-  const { activeChat } = useChat();
+  // const { activeChat } = useChat();
+  const { selectedChat } = useSelectedChat();
   const { replyMessageId, clearReplyTo } = useReplyMessage();
 
   // State
@@ -29,16 +30,18 @@ export default function ChatInput() {
 
   // Convex
   const currentUser = useQuery(api.users.getCurrentUser);
-  const generateUploadUrl = useMutation(api.messages.generateUploadUrl);
-  const storeMessage = useMutation(api.messages.store);
-  const updateChat = useMutation(api.chats.updateChatById);
-  const storeUnreadMessage = useMutation(api.unread_messages.store);
+  const generateUploadUrl = useMutation(api.chats.generateUploadUrl);
+  const addUnreadMessage = useMutation(api.chats.addUnreadMessage);
+  const sendMessage = useMutation(api.chats.sendMessage);
+  const getChatParticipants = useQuery(api.chats.getChatParticipants, {
+    chatId: selectedChat?.chatId as Id<"chats">,
+  });
 
-  const interlocutor = activeChat?.participants.find(
-    (p) => p !== currentUser?._id,
+  const interlocutor = getChatParticipants?.find(
+    (p) => p?._id !== currentUser?._id,
   );
 
-  const sendMessage = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!text!.trim()) return;
@@ -62,24 +65,16 @@ export default function ChatInput() {
       storageId = response.storageId;
     }
 
-    storeMessage({
-      chat: activeChat?._id as Id<"chats">,
-      sender: currentUser?._id as Id<"users">,
-      content: text as string,
-      replyTo: (replyMessageId as Id<"messages">) || undefined,
-      mediaUrl: storageId,
+    sendMessage({
+      chatId: selectedChat?.chatId as Id<"chats">,
+      text: text as string,
+      replyTo: (replyMessageId as Id<"chat_messages">) || undefined,
+      mediaId: (storageId as Id<"_storage">) || undefined,
     });
 
-    updateChat({
-      _id: activeChat?._id as Id<"chats">,
-      lastMessage: text as string,
-      lastMessageSender: currentUser?._id as Id<"users">,
-      lastMessageTime: Date.now(),
-    });
-
-    storeUnreadMessage({
-      user: interlocutor as Id<"users">,
-      chat: activeChat?._id as Id<"chats">,
+    addUnreadMessage({
+      userId: interlocutor?._id as Id<"users">,
+      chatId: selectedChat?.chatId as Id<"chats">,
       count: 1,
     });
 
@@ -96,14 +91,14 @@ export default function ChatInput() {
     setSelectedImage(null);
     imageInput.current!.value = "";
     setIsLoading(false);
-  }, [activeChat]);
+  }, [selectedChat]);
 
   return (
     <div className={`space-y-2 p-2`}>
       {/* Reply to */}
       {replyMessageId && <ReplyTo />}
 
-      {/* TODO: Media */}
+      {/* Media */}
       {selectedImage && (
         <div className="ml-12 flex items-center gap-2">
           <div className="relative overflow-hidden rounded-md before:absolute before:inset-0 before:bg-black before:opacity-50">
@@ -131,7 +126,7 @@ export default function ChatInput() {
       <form
         ref={formRef}
         className="flex items-end gap-2"
-        onSubmit={sendMessage}
+        onSubmit={handleSubmit}
       >
         {/* Attachments */}
         <div>

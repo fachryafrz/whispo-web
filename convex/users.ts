@@ -22,13 +22,14 @@ export const getCurrentUser = query({
   },
 });
 
-export const getUserById = query({
-  args: { _id: v.id("users") },
+export const getUser = query({
+  args: {
+    userId: v.optional(v.id("users")),
+  },
   handler: async (ctx, args) => {
-    return await ctx.db
-      .query("users")
-      .withIndex("by_id", (q) => q.eq("_id", args._id))
-      .first();
+    if (!args.userId) return;
+    
+    return await ctx.db.get(args.userId);
   },
 });
 

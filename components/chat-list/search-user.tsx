@@ -2,58 +2,42 @@ import { Button } from "@heroui/button";
 import { Input } from "@heroui/input";
 import { ArrowLeft } from "lucide-react";
 import { useMutation, useQuery } from "convex/react";
-import { useEffect, useState } from "react";
 
 import ChatCard from "./card";
 
 import { useSearchUser } from "@/zustand/search-user";
 import { api } from "@/convex/_generated/api";
-import { useChat } from "@/zustand/chat";
 import { Doc, Id } from "@/convex/_generated/dataModel";
-import { arraysEqual } from "@/helper/arrays-equal";
+import { useSelectedChat } from "@/zustand/selected-chat";
 
 export default function SearchUser() {
   // Zustand
   const { open, setOpen, query, setQuery } = useSearchUser();
-  const { activeChat, setActiveChat } = useChat();
-
-  // React
-  const [isAdded, setIsAdded] = useState<Doc<"chats">>();
+  const { selectedChat, setSelectedChat } = useSelectedChat();
 
   // Convex
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const chats = useQuery(api.chats.getChatsByCurrentUser);
   const users = useQuery(api.users.searchByUsername, {
     usernameQuery: query,
   });
-  const storeChat = useMutation(api.chats.store);
+  const selectOrStartConversation = useMutation(
+    api.chats.selectOrStartConversation,
+  );
 
   // Functions
-  const handleSelectUser = (user: Doc<"users">) => {
-    const value = {
+  const handleSelectUser = async (user: Doc<"users">) => {
+    const chat = await selectOrStartConversation({
       type: "private",
-      participants: [user._id, currentUser?._id as Id<"users">],
-    };
+      targetId: user._id,
+    });
 
-    storeChat(value);
-    setIsAdded(value as Doc<"chats">);
+    setSelectedChat({
+      chatId: chat?._id as Id<"chats">,
+      type: "private",
+      name: user.name,
+      description: user.username,
+      imageUrl: user.avatarUrl,
+    });
   };
-
-  useEffect(() => {
-    if (isAdded) {
-      const chatData = chats?.find((chat) =>
-        arraysEqual(chat.participants, isAdded?.participants as Id<"users">[]),
-      );
-
-      setActiveChat(chatData as Doc<"chats">);
-    }
-  }, [isAdded, chats]);
-
-  useEffect(() => {
-    if (activeChat) {
-      setIsAdded(undefined);
-    }
-  }, [activeChat]);
 
   return (
     <div

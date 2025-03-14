@@ -35,17 +35,11 @@ export default function ArchivedChats() {
         </h2>
       </div>
 
-      {/* No results */}
-      {/* {chats?.length === 0 && (
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 p-4 text-center text-default-500">
-          <p className="text-sm">No archived chats</p>
-        </div>
-      )} */}
-
       {/* Results */}
-      <ul>
+      <ul className={`h-full overflow-y-auto`}>
         {/* No results */}
-        {archivedChats?.length === 0 && (
+        {(archivedChats?.length === 0 ||
+          archivedChats?.every((chat) => !chat?.lastMessage)) && (
           <li className="flex h-full flex-col items-center justify-center gap-2 p-4 text-center text-default-500">
             <p className="text-sm">No archived chats</p>
           </li>
@@ -53,7 +47,8 @@ export default function ArchivedChats() {
 
         {/* Chats */}
         {archivedChats
-          ?.sort((a, b) => b!.lastMessageTime! - a!.lastMessageTime!)
+          ?.filter((chat) => chat!.lastMessage)
+          .sort((a, b) => b!.lastMessageTime! - a!.lastMessageTime!)
           .map((chat) => (
             <li key={chat!._id}>
               <ChatListCard archived chat={chat!} />

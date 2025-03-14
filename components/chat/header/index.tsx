@@ -1,29 +1,17 @@
 import { Button } from "@heroui/button";
-import { Image } from "@heroui/image";
 import { addToast } from "@heroui/toast";
 import { ArrowLeft, Search } from "lucide-react";
-import { useQuery } from "convex/react";
 import { useRouter } from "next/navigation";
+import { Image } from "@heroui/image";
 
 import Options from "./options";
 
-import { useChat } from "@/zustand/chat";
-import { api } from "@/convex/_generated/api";
-import { Id } from "@/convex/_generated/dataModel";
+import { useSelectedChat } from "@/zustand/selected-chat";
 
 export default function ChatHeader() {
   const router = useRouter();
 
-  const { activeChat, clearActiveChat } = useChat();
-
-  const currentUser = useQuery(api.users.getCurrentUser);
-  const chatById = useQuery(api.chats.getChatById, {
-    _id: activeChat?._id as Id<"chats">,
-  });
-
-  const interlocutor = chatById?.participants.find(
-    (p) => p?._id !== currentUser?._id,
-  );
+  const { selectedChat, clearSelectedChat } = useSelectedChat();
 
   return (
     <div className={`p-4`}>
@@ -34,7 +22,7 @@ export default function ChatHeader() {
           radius="full"
           variant="light"
           onPress={() => {
-            clearActiveChat();
+            clearSelectedChat();
             router.back();
           }}
         >
@@ -47,11 +35,7 @@ export default function ChatHeader() {
           draggable={false}
           height={40}
           radius="full"
-          src={
-            activeChat?.type === "private"
-              ? interlocutor?.avatarUrl
-              : activeChat?.imageUrl
-          }
+          src={selectedChat!.imageUrl}
           width={40}
         />
 
@@ -59,16 +43,12 @@ export default function ChatHeader() {
         <div className="min-w-0 flex-1">
           {/* Name */}
           <h2 className="line-clamp-1 text-small font-bold">
-            {activeChat?.type === "private"
-              ? interlocutor?.name
-              : activeChat?.name}
+            {selectedChat!.name}
           </h2>
 
           {/* Text */}
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500">
-            {activeChat?.type === "private"
-              ? interlocutor?.username
-              : activeChat?.description}
+            {selectedChat!.description}
           </p>
         </div>
 
