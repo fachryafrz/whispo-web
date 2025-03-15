@@ -20,7 +20,7 @@ export default function Error({
 
   return (
     <div
-      className={`absolute inset-0 z-10 flex h-dvh flex-1 flex-col items-center justify-center gap-4 bg-black md:static`}
+      className={`absolute inset-0 z-10 flex h-dvh flex-1 flex-col items-center justify-center gap-4 bg-white dark:bg-black md:static`}
     >
       <Logo width={80} />
       <h2 className={`text-2xl font-bold`}>Something went wrong!</h2>

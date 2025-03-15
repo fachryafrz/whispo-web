@@ -11,7 +11,9 @@ export default function ChatList() {
   useStoreUserEffect();
 
   return (
-    <section className={`flex flex-1 flex-col bg-black md:z-10 md:max-w-96`}>
+    <section
+      className={`flex flex-1 flex-col bg-white dark:bg-black md:z-10 md:max-w-96`}
+    >
       <ChatListHeader />
 
       <div className="relative flex-1 overflow-x-hidden">
