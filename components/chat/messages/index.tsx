@@ -47,7 +47,7 @@ export default function ChatMessages() {
   }, [inView]);
 
   return (
-    <div className="relative flex-1 overflow-y-hidden before:absolute before:inset-0 before:bg-[url(/background/doodle.avif)] before:bg-[size:350px] before:bg-repeat before:opacity-10 before:dark:invert">
+    <div className="relative flex-1 overflow-y-hidden before:absolute before:inset-0 before:bg-[url(/background/doodle.avif)] before:bg-[size:350px] before:bg-repeat before:opacity-15 before:dark:invert md:before:opacity-10">
       {/* Messages */}
       <div
         ref={containerRef}
