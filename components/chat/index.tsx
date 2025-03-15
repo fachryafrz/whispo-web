@@ -17,30 +17,22 @@ export default function Chat() {
     useSelectedChat();
 
   useEffect(() => {
-    const isSmallScreen = window.innerWidth < 768;
-
     if (pathname === "/") {
       setShowChatRoom(false);
 
-      setTimeout(
-        () => {
-          clearSelectedChat();
-        },
-        isSmallScreen ? 500 : 0, // If the screen is small, wait 500ms before clearing the selected chat
-      );
+      setTimeout(() => {
+        clearSelectedChat();
+      }, 500);
     }
 
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && pathname !== "/") {
         setShowChatRoom(false);
 
-        setTimeout(
-          () => {
-            clearSelectedChat();
-            router.back();
-          },
-          isSmallScreen ? 500 : 0, // If the screen is small, wait 500ms before clearing the selected chat
-        );
+        setTimeout(() => {
+          clearSelectedChat();
+          router.back();
+        }, 500);
       }
     };
 
@@ -65,7 +57,7 @@ export default function Chat() {
     <>
       {selectedChat && (
         <section
-          className={`fixed inset-0 z-10 flex w-full flex-1 flex-col bg-white transition-all duration-500 dark:bg-black md:static md:z-0 ${showChatRoom ? "translate-x-0" : "translate-x-full md:translate-x-0"}`}
+          className={`fixed inset-0 z-10 flex w-full flex-1 flex-col bg-white transition-all duration-500 dark:bg-black md:static md:z-0 ${showChatRoom ? "translate-x-0 md:opacity-100" : "translate-x-full md:translate-x-0 md:opacity-0"}`}
         >
           {/* Header */}
           <ChatHeader />
