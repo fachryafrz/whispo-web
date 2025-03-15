@@ -11,7 +11,8 @@ import { useSelectedChat } from "@/zustand/selected-chat";
 export default function ChatHeader() {
   const router = useRouter();
 
-  const { selectedChat, clearSelectedChat } = useSelectedChat();
+  const { selectedChat, clearSelectedChat, showChatRoom, setShowChatRoom } =
+    useSelectedChat();
 
   return (
     <div className={`p-4`}>
@@ -22,8 +23,12 @@ export default function ChatHeader() {
           radius="full"
           variant="light"
           onPress={() => {
-            clearSelectedChat();
-            router.back();
+            setShowChatRoom(false);
+
+            setTimeout(() => {
+              clearSelectedChat();
+              router.back();
+            }, 500);
           }}
         >
           <ArrowLeft />
@@ -35,7 +40,7 @@ export default function ChatHeader() {
           draggable={false}
           height={40}
           radius="full"
-          src={selectedChat!.imageUrl}
+          src={selectedChat?.imageUrl}
           width={40}
         />
 
@@ -43,12 +48,12 @@ export default function ChatHeader() {
         <div className="min-w-0 flex-1">
           {/* Name */}
           <h2 className="line-clamp-1 text-small font-bold">
-            {selectedChat!.name}
+            {selectedChat?.name}
           </h2>
 
           {/* Text */}
           <p className="overflow-hidden text-ellipsis whitespace-nowrap text-small text-default-500">
-            {selectedChat!.description}
+            {selectedChat?.description}
           </p>
         </div>
 

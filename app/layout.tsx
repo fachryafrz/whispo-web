@@ -9,6 +9,7 @@ import { fontSans } from "@/config/fonts";
 import { ConvexClientProvider } from "@/components/convex-client-provider";
 import ChatList from "@/components/chat-list";
 import ImageCarousel from "@/components/modal/image-carousel";
+import Chat from "@/components/chat";
 
 export const metadata: Metadata = {
   title: {
@@ -77,6 +78,8 @@ export default function RootLayout({
             <main>
               <div className={`relative flex h-svh`}>
                 <ChatList />
+
+                <Chat />
 
                 {children}
               </div>

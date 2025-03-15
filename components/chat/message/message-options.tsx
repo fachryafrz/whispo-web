@@ -104,24 +104,19 @@ export default function MessageOptions({
             </>
           ) : null}
 
-          {/* If message was unsent */}
-          {msg.isUnsent && (
-            <>
-              {/* Delete */}
-              <DropdownMenuItem
-                className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
-                onClick={() => {
-                  deleteMessage({
-                    chatId: msg.chatId as Id<"chats">,
-                    messageId: msg._id as Id<"chat_messages">,
-                  });
-                }}
-              >
-                <Trash2 size={20} />
-                <div>Delete for me</div>
-              </DropdownMenuItem>
-            </>
-          )}
+          {/* Delete */}
+          <DropdownMenuItem
+            className="cursor-pointer text-danger hover:!bg-danger hover:!text-white"
+            onClick={() => {
+              deleteMessage({
+                chatId: msg.chatId as Id<"chats">,
+                messageId: msg._id as Id<"chat_messages">,
+              });
+            }}
+          >
+            <Trash2 size={20} />
+            <div>Delete for me</div>
+          </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
 

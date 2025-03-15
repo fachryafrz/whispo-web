@@ -32,7 +32,7 @@ export default function ChatCard({
 
   return (
     <Button
-      className="h-auto w-full rounded-none border-b border-default-200 p-4 text-start last:border-b-0 dark:border-neutral-800"
+      className="h-auto w-full rounded-none border-b border-default-200 p-4 text-start !outline-none last:border-b-0 dark:border-neutral-800"
       variant="light"
       onPress={() => {
         onPress();
