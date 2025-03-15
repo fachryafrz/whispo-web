@@ -20,16 +20,6 @@ Whispo is a fast, secure, and intuitive real-time chat application designed to e
 - **Real-time Updates** – Messages sync instantly using Convex's real-time database.
 - **Scalable & Modern** – Built with Next.js 15 and TypeScript for performance and maintainability.
 
-## 🛠️ Tech Stack
-
-- **Next.js 15** – React-based framework
-- **React** – JavaScript framework
-- **HeroUI** – Tailwind CSS component library
-- **Tailwind CSS** – Styling and UI design
-- **Clerk** – Secure authentication
-- **Convex** – Real-time database
-- **Typescript** – Static type checking
-
 ## ✨ Features
 
 - 🔑 Authentication with Clerk
@@ -57,3 +47,41 @@ Whispo is a fast, secure, and intuitive real-time chat application designed to e
   - 🗑️ Delete messages
   - 🖼️ Message with media
   - 📑 Auto load messages
+
+## 🛠️ Tech Stack
+
+- **Next.js 15** – React-based framework
+- **React** – JavaScript framework
+- **HeroUI** – Tailwind CSS component library
+- **Tailwind CSS** – Styling and UI design
+- **Clerk** – Secure authentication
+- **Convex** – Real-time database
+- **Typescript** – Static type checking
+
+## 🚀 Fork the repository
+
+### 1. Fork
+
+Click the **Fork** button at the top-right corner of this page to create a copy of this repository in your account.
+
+### 2. Clone Your Forked Repository
+
+```sh
+git clone https://github.com/{your-username}/whispo.git
+
+cd whispo
+
+npm install
+
+cp .env.example .env.local
+
+npm run dev
+```
+
+## 🤝 Contributing
+
+Contributions are welcome! Please fork the repository, make your changes, and submit a pull request. We'll review and merge your contributions as we continue to improve Popcorn Vision.
+
+## 📜 License
+
+This project is licensed under the [MIT License](LICENSE).
