@@ -67,7 +67,9 @@ export default function ChatCard({
               {hasMedia && (
                 <ImageIcon
                   className={
-                    unreadCount ? "font-bold text-white" : "text-default-500"
+                    unreadCount
+                      ? "font-bold dark:text-white"
+                      : "text-default-500"
                   }
                   size={16}
                 />
