@@ -17,6 +17,7 @@ export default function ChatHeader() {
   return (
     <div className={`p-4`}>
       <div className="flex items-center gap-2">
+        {/* Back Button (Mobile) */}
         <Button
           isIconOnly
           className="md:hidden"
