@@ -2,7 +2,7 @@ import { Button } from "@heroui/button";
 import { addToast } from "@heroui/toast";
 import { ArrowLeft, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { Image } from "@heroui/image";
+import { Avatar } from "@heroui/avatar";
 
 import Options from "./options";
 
@@ -36,13 +36,10 @@ export default function ChatHeader() {
         </Button>
 
         {/* Avatar/Image */}
-        <Image
-          alt="avatar"
-          draggable={false}
-          height={40}
-          radius="full"
+        <Avatar
+          className={`[&_img]:pointer-events-none`}
+          name={selectedChat?.name}
           src={selectedChat?.imageUrl}
-          width={40}
         />
 
         {/* Content */}

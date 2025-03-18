@@ -1,9 +1,9 @@
 import { Button } from "@heroui/button";
 import { Chip } from "@heroui/chip";
-import { Image } from "@heroui/image";
 import { Pin, Image as ImageIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import ReactMarkdown from "react-markdown";
+import { Avatar } from "@heroui/avatar";
 
 type ChatCardProps = {
   title: string;
@@ -41,17 +41,7 @@ export default function ChatCard({
     >
       <div className="grid w-full grid-cols-[40px_1fr_auto] items-center gap-2">
         {/* Avatar/Image */}
-        <div>
-          {imageUrl && (
-            <Image
-              alt="avatar"
-              height={40}
-              radius="full"
-              src={imageUrl}
-              width={40}
-            />
-          )}
-        </div>
+        {imageUrl && <Avatar name={title} src={imageUrl} />}
 
         {/* Content */}
         <div className="min-w-0">
